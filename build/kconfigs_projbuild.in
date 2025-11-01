@@ -1,0 +1,7 @@
+source "/home/juanman/esp/esp-idf/components/bootloader/Kconfig.projbuild"
+source "/home/juanman/esp/esp-idf/components/esp_app_format/Kconfig.projbuild"
+source "/home/juanman/esp/esp-idf/components/esp_rom/Kconfig.projbuild"
+source "/home/juanman/esp/esp-idf/components/esptool_py/Kconfig.projbuild"
+source "/home/juanman/esp/esp-idf/components/partition_table/Kconfig.projbuild"
+source "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/Kconfig.projbuild"
+source "/home/juanman/Programming/embedded_projects/customizable_digital_clock/managed_components/atanisoft__esp_lcd_touch_xpt2046/Kconfig.projbuild"

@@ -1,0 +1,2 @@
+source /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/gdbinit/symbols
+source /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/gdbinit/connect
