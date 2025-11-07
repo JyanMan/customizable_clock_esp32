@@ -3,5 +3,8 @@ file(GLOB SRC_FILES
     "src/*.c"
 )
 
+
 idf_component_register(SRCS ${SRC_FILES}
-                       INCLUDE_DIRS "./include")
+                       INCLUDE_DIRS "./include"
+                       PRIV_REQUIRES esp_wifi nvs_flash wpa_supplicant esp_driver_gptimer
+                     )

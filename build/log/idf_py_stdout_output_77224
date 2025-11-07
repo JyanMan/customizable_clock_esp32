@@ -1,0 +1,11 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python -DESP_PLATFORM=1 -DCCACHE_ENABLE=False /home/juanman/Programming/embedded_projects/customizable_digital_clock
+-- Minimal build - ON
+-- Building ESP-IDF components for target esp32
+NOTICE: Processing 5 dependencies:
+NOTICE: [1/5] atanisoft/esp_lcd_touch_xpt2046 (1.0.6)
+NOTICE: [2/5] espressif/esp_lcd_touch (1.1.2)
+NOTICE: [3/5] espressif/esp_lcd_touch_stmpe610 (1.0.7)
+NOTICE: [4/5] lvgl/lvgl (9.3.0)
+NOTICE: [5/5] idf (6.0.0)
+-- ESP-TEE is currently supported only on the esp32c6;esp32h2;esp32c5 SoCs
+-- Configuring incomplete, errors occurred!

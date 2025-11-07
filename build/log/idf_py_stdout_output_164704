@@ -1,0 +1,413 @@
+Command: /home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python /home/juanman/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/spi_lcd_touch.elf /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/bootloader/bootloader.elf -m '/home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python' '/home/juanman/esp/esp-idf/tools/idf.py'
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6376
+load:0x40078000,len:15900
+ho 0 tail 12 room 4
+load:0x40080400,len:3920
+entry 0x40080644
+[0;32mI (29) boot: ESP-IDF v6.0-dev-2980-gab149384e1 2nd stage bootloader[0m
+[0;32mI (29) boot: compile time Nov  5 2025 22:17:43[0m
+[0;32mI (29) boot: Multicore bootloader[0m
+[0;32mI (32) boot: chip revision: v3.1[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (39) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (42) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (46) boot: Enabling RNG early entropy source...[0m
+[0;32mI (50) boot: Partition Table:[0m
+[0;32mI (53) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (59) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (66) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (72) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (79) boot: End of partition table[0m
+[0;32mI (82) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2b920h (178464) map[0m
+[0;32mI (153) esp_image: segment 1: paddr=0003b948 vaddr=3ffb0000 size=043ach ( 17324) load[0m
+[0;32mI (160) esp_image: segment 2: paddr=0003fcfc vaddr=40080000 size=0031ch (   796) load[0m
+[0;32mI (161) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=d0078h (852088) map[0m
+[0;32mI (468) esp_image: segment 4: paddr=001100a0 vaddr=4008031c size=18c84h (101508) load[0m
+[0;32mI (510) esp_image: segment 5: paddr=00128d2c vaddr=50000000 size=000a0h (   160) load[0m
+[0;32mI (522) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (523) boot: Disabling RNG early entropy source...[0m
+[0;32mI (533) cpu_start: Multicore app[0m
+[0;32mI (541) cpu_start: GPIO 3 and 1 are used as console UART I/O pins[0m
+[0;32mI (542) cpu_start: Pro cpu start user code[0m
+[0;32mI (542) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (544) app_init: Application information:[0m
+[0;32mI (547) app_init: Project name:     spi_lcd_touch[0m
+[0;32mI (552) app_init: App version:      5ab554f-dirty[0m
+[0;32mI (556) app_init: Compile time:     Nov  5 2025 22:17:33[0m
+[0;32mI (561) app_init: ELF file SHA256:  cb7a14480...[0m
+[0;32mI (566) app_init: ESP-IDF:          v6.0-dev-2980-gab149384e1[0m
+[0;32mI (571) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (575) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (579) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (583) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (589) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (594) heap_init: At 3FFC8EB0 len 00017150 (92 KiB): DRAM[0m
+[0;32mI (599) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (605) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (610) heap_init: At 40098FA0 len 00007060 (28 KiB): IRAM[0m
+[0;33mW (617) spi_flash: Detected boya flash chip but using generic driver. For optimal functionality, enable `SPI_FLASH_SUPPORT_BOYA_CHIP` in menuconfig[0m
+[0;32mI (629) spi_flash: detected chip: generic[0m
+[0;32mI (632) spi_flash: flash io: dio[0m
+[0;33mW (635) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (649) main_task: Started on CPU0[0m
+[0;32mI (659) main_task: Calling app_main()[0m
+[0;32mI (679) example: Turn off LCD backlight[0m
+[0;32mI (689) example: Initialize SPI bus[0m
+[0;32mI (689) example: Install panel IO[0m
+[0;32mI (689) example: Install ST7789 panel driver[0m
+[0;32mI (809) example: Turn on LCD backlight[0m
+[0;32mI (809) example: Initialize LVGL library[0m
+[0;32mI (809) example: Install LVGL tick timer[0m
+[0;32mI (809) example: Register io panel event callback for LVGL flush ready notification[0m
+[0;32mI (819) example: Create LVGL task[0m
+[0;32mI (819) example: Starting LVGL task[0m
+[0;32mI (889) example: Display LVGL Meter Widget[0m
+[0;32mI (899) example: Create Stopwatch Update Task[0m
+[0;32mI (899) example: Boot count: 1[0m
+[0;32mI (899) example: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (899) wifi station: ESP_WIFI_MODE_STA[0m
+[0;32mI (919) wifi:wifi driver task: 3ffd572c, prio:23, stack:6656, core=0[0m
+[0;32mI (929) wifi:wifi firmware version: d651973[0m
+[0;32mI (929) wifi:wifi certification version: v7.0[0m
+[0;32mI (929) wifi:config NVS flash: enabled[0m
+[0;32mI (929) wifi:config nano formatting: disabled[0m
+[0;32mI (939) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (939) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (949) wifi:Init management short buffer num: 32[0m
+[0;32mI (949) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (959) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (959) wifi:Init static rx buffer num: 10[0m
+[0;32mI (959) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (969) wifi_init: rx ba win: 6[0m
+[0;32mI (969) wifi_init: accept mbox: 6[0m
+[0;32mI (969) wifi_init: tcpip mbox: 32[0m
+[0;32mI (979) wifi_init: udp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp tx win: 5760[0m
+[0;32mI (979) wifi_init: tcp rx win: 5760[0m
+[0;32mI (989) wifi_init: tcp mss: 1440[0m
+[0;32mI (989) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (989) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (999) phy_init: phy_version 4861,b71b5ad,Aug  5 2025,11:16:06[0m
+[0;32mI (1089) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (1089) wifi:enable tsf[0m
+[0;32mI (1089) wifi station: wifi_init_sta finished.[0m
+[0;32mI (1109) wifi:new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1109) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (2109) wifi:state: auth -> init (0x200)[0m
+[0;32mI (2119) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (2119) wifi station: retry to connect to the AP[0m
+[0;32mI (2119) wifi station: connect to the AP fail[0m
+[0;32mI (4539) wifi station: retry to connect to the AP[0m
+[0;32mI (4539) wifi station: connect to the AP fail[0m
+[0;32mI (4549) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (4559) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (4569) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (4589) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (4609) wifi:connected with Converge_2.4GHz_g9C8, aid = 3, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (4609) wifi:security: WPA2-PSK, phy: bgn, rssi: -90[0m
+[0;32mI (4609) wifi:pm start, type: 1[0m
+
+[0;32mI (4609) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (4649) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (7769) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (7769) wifi station: got ip:192.168.100.114[0m
+[0;32mI (7769) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (7779) example: Initializing and starting SNTP[0m
+[0;32mI (7779) example: List of configured NTP servers:[0m
+[0;32mI (7779) example: server 0: pool.ntp.org[0m
+[0;32mI (9679) wifi:<ba-add>idx:0 (ifx:0, 7a:eb:46:71:2d:94), tid:0, ssn:1, winSize:64[0m
+[0;32mI (9789) example: Waiting for system time to be set... (1/15)[0m
+[0;32mI (11789) example: Waiting for system time to be set... (2/15)[0m
+[0;32mI (13789) example: Waiting for system time to be set... (3/15)[0m
+[0;32mI (15789) example: Waiting for system time to be set... (4/15)[0m
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6376
+load:0x40078000,len:15900
+ho 0 tail 12 room 4
+load:0x40080400,len:3920
+entry 0x40080644
+[0;32mI (29) boot: ESP-IDF v6.0-dev-2980-gab149384e1 2nd stage bootloader[0m
+[0;32mI (29) boot: compile time Nov  5 2025 22:17:43[0m
+[0;32mI (29) boot: Multicore bootloader[0m
+[0;32mI (32) boot: chip revision: v3.1[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (39) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (42) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (46) boot: Enabling RNG early entropy source...[0m
+[0;32mI (50) boot: Partition Table:[0m
+[0;32mI (53) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (59) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (66) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (72) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (79) boot: End of partition table[0m
+[0;32mI (82) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2b920h (178464) map[0m
+[0;32mI (153) esp_image: segment 1: paddr=0003b948 vaddr=3ffb0000 size=043ach ( 17324) load[0m
+[0;32mI (160) esp_image: segment 2: paddr=0003fcfc vaddr=40080000 size=0031ch (   796) load[0m
+[0;32mI (161) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=d0078h (852088) map[0m
+[0;32mI (468) esp_image: segment 4: paddr=001100a0 vaddr=4008031c size=18c84h (101508) load[0m
+[0;32mI (510) esp_image: segment 5: paddr=00128d2c vaddr=50000000 size=000a0h (   160) load[0m
+[0;32mI (522) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (523) boot: Disabling RNG early entropy source...[0m
+[0;32mI (533) cpu_start: Multicore app[0m
+[0;32mI (541) cpu_start: GPIO 3 and 1 are used as console UART I/O pins[0m
+[0;32mI (542) cpu_start: Pro cpu start user code[0m
+[0;32mI (542) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (544) app_init: Application information:[0m
+[0;32mI (547) app_init: Project name:     spi_lcd_touch[0m
+[0;32mI (552) app_init: App version:      5ab554f-dirty[0m
+[0;32mI (556) app_init: Compile time:     Nov  5 2025 22:17:33[0m
+[0;32mI (561) app_init: ELF file SHA256:  cb7a14480...[0m
+[0;32mI (566) app_init: ESP-IDF:          v6.0-dev-2980-gab149384e1[0m
+[0;32mI (571) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (575) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (579) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (583) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (589) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (594) heap_init: At 3FFC8EB0 len 00017150 (92 KiB): DRAM[0m
+[0;32mI (599) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (605) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (610) heap_init: At 40098FA0 len 00007060 (28 KiB): IRAM[0m
+[0;33mW (617) spi_flash: Detected boya flash chip but using generic driver. For optimal functionality, enable `SPI_FLASH_SUPPORT_BOYA_CHIP` in menuconfig[0m
+[0;32mI (629) spi_flash: detected chip: generic[0m
+[0;32mI (632) spi_flash: flash io: dio[0m
+[0;33mW (635) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (649) main_task: Started on CPU0[0m
+[0;32mI (659) main_task: Calling app_main()[0m
+[0;32mI (679) example: Turn off LCD backlight[0m
+[0;32mI (689) example: Initialize SPI bus[0m
+[0;32mI (689) example: Install panel IO[0m
+[0;32mI (689) example: Install ST7789 panel driver[0m
+[0;32mI (809) example: Turn on LCD backlight[0m
+[0;32mI (809) example: Initialize LVGL library[0m
+[0;32mI (809) example: Install LVGL tick timer[0m
+[0;32mI (809) example: Register io panel event callback for LVGL flush ready notification[0m
+[0;32mI (819) example: Create LVGL task[0m
+[0;32mI (819) example: Starting LVGL task[0m
+[0;32mI (889) example: Display LVGL Meter Widget[0m
+[0;32mI (899) example: Create Stopwatch Update Task[0m
+[0;32mI (899) example: Boot count: 1[0m
+[0;32mI (899) example: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (899) wifi station: ESP_WIFI_MODE_STA[0m
+[0;32mI (919) wifi:wifi driver task: 3ffd572c, prio:23, stack:6656, core=0[0m
+[0;32mI (929) wifi:wifi firmware version: d651973[0m
+[0;32mI (929) wifi:wifi certification version: v7.0[0m
+[0;32mI (929) wifi:config NVS flash: enabled[0m
+[0;32mI (929) wifi:config nano formatting: disabled[0m
+[0;32mI (939) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (939) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (949) wifi:Init management short buffer num: 32[0m
+[0;32mI (949) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (959) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (959) wifi:Init static rx buffer num: 10[0m
+[0;32mI (959) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (969) wifi_init: rx ba win: 6[0m
+[0;32mI (969) wifi_init: accept mbox: 6[0m
+[0;32mI (969) wifi_init: tcpip mbox: 32[0m
+[0;32mI (979) wifi_init: udp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp tx win: 5760[0m
+[0;32mI (979) wifi_init: tcp rx win: 5760[0m
+[0;32mI (989) wifi_init: tcp mss: 1440[0m
+[0;32mI (989) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (989) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (999) phy_init: phy_version 4861,b71b5ad,Aug  5 2025,11:16:06[0m
+[0;32mI (1089) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(0)[0m
+[0;32mI (1159) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (1169) wifi:enable tsf[0m
+[0;32mI (1169) wifi station: wifi_init_sta finished.[0m
+[0;32mI (1179) wifi:new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1179) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (2189) wifi:state: auth -> init (0x200)[0m
+[0;32mI (2199) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (2199) wifi station: retry to connect to the AP[0m
+[0;32mI (2199) wifi station: connect to the AP fail[0m
+[0;32mI (4619) wifi station: retry to connect to the AP[0m
+[0;32mI (4619) wifi station: connect to the AP fail[0m
+[0;32mI (4629) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (4629) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (4649) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (4659) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (4679) wifi:connected with Converge_2.4GHz_g9C8, aid = 3, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (4679) wifi:security: WPA2-PSK, phy: bgn, rssi: -74[0m
+[0;32mI (4689) wifi:pm start, type: 1[0m
+
+[0;32mI (4689) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (4759) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (7859) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (7859) wifi station: got ip:192.168.100.114[0m
+[0;32mI (7859) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (7869) example: Initializing and starting SNTP[0m
+[0;32mI (7869) example: List of configured NTP servers:[0m
+[0;32mI (7869) example: server 0: pool.ntp.org[0m
+[0;32mI (9879) example: Waiting for system time to be set... (1/15)[0m
+[0;32mI (11879) example: Waiting for system time to be set... (2/15)[0m
+[0;32mI (13879) example: Waiting for system time to be set... (3/15)[0m
+[0;32mI (15879) example: Waiting for system time to be set... (4/15)[0m
+[0;32mI (17879) example: Waiting for system time to be set... (5/15)[0m
+[0;32mI (19879) example: Waiting for system time to be set... (6/15)[0m
+[0;32mI (21879) example: Waiting for system time to be set... (7/15)[0m
+[0;32mI (23879) example: Waiting for system time to be set... (8/15)[0m
+[0;32mI (25879) example: Waiting for system time to be set... (9/15)[0m
+[0;32mI (27879) example: Waiting for system time to be set... (10/15)[0m
+[0;32mI (29879) example: Waiting for system time to be set... (11/15)[0m
+[0;32mI (30069) wifi:<ba-add>idx:0 (ifx:0, 7a:eb:46:71:2d:94), tid:0, ssn:1, winSize:64[0m
+[0;32mI (31879) example: Waiting for system time to be set... (12/15)[0m
+[0;32mI (33879) example: Waiting for system time to be set... (13/15)[0m
+[0;32mI (35879) example: Waiting for system time to be set... (14/15)[0m
+[0;32mI (37879) wifi:state: run -> init (0x0)[0m
+[0;32mI (37889) wifi:pm stop, total sleep time: 27888196 us / 33198939 us[0m
+
+[0;32mI (37889) wifi:<ba-del>idx:0, tid:0[0m
+[0;32mI (37889) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (37899) wifi station: retry to connect to the AP[0m
+[0;32mI (37899) wifi station: connect to the AP fail[0m
+[0;32mI (37899) wifi:flush txq[0m
+[0;32mI (37899) wifi:stop sw txq[0m
+[0;32mI (37909) wifi:lmac stop hw txq[0m
+[0;32mI (37909) wifi:Deinit lldesc rx mblock:10[0m
+[0;32mI (37919) example: The current date/time in New York is: Wed Dec 31 19:00:37 1969[0m
+[0;32mI (37919) example: The current date/time in Metro Manila is: Thu Jan  1 08:00:37 1970[0m
+[0;32mI (37929) example: Entering deep sleep for 10 seconds[0m
+ets Jul 29 2019 12:21:46
+
+rst:0x5 (DEEPSLEEP_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6376
+load:0x40078000,len:15900
+ho 0 tail 12 room 4
+load:0x40080400,len:3920
+entry 0x40080644
+[0;32mI (29) boot: ESP-IDF v6.0-dev-2980-gab149384e1 2nd stage bootloader[0m
+[0;32mI (29) boot: compile time Nov  5 2025 22:17:43[0m
+[0;32mI (29) boot: Multicore bootloader[0m
+[0;32mI (32) boot: chip revision: v3.1[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (39) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (42) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (46) boot: Enabling RNG early entropy source...[0m
+[0;32mI (51) boot: Partition Table:[0m
+[0;32mI (53) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (59) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (66) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (73) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (79) boot: End of partition table[0m
+[0;32mI (82) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2b920h (178464) map[0m
+[0;32mI (153) esp_image: segment 1: paddr=0003b948 vaddr=3ffb0000 size=043ach ( 17324) load[0m
+[0;32mI (160) esp_image: segment 2: paddr=0003fcfc vaddr=40080000 size=0031ch (   796) load[0m
+[0;32mI (161) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=d0078h (852088) map[0m
+[0;32mI (468) esp_image: segment 4: paddr=001100a0 vaddr=4008031c size=18c84h (101508) load[0m
+[0;32mI (510) esp_image: segment 5: paddr=00128d2c vaddr=50000000 size=000a0h (   160) [0m
+[0;32mI (523) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (523) boot: Disabling RNG early entropy source...[0m
+[0;32mI (533) cpu_start: Multicore app[0m
+[0;32mI (542) cpu_start: GPIO 3 and 1 are used as console UART I/O pins[0m
+[0;32mI (542) cpu_start: Pro cpu start user code[0m
+[0;32mI (542) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (544) app_init: Application information:[0m
+[0;32mI (548) app_init: Project name:     spi_lcd_touch[0m
+[0;32mI (552) app_init: App version:      5ab554f-dirty[0m
+[0;32mI (556) app_init: Compile time:     Nov  5 2025 22:17:33[0m
+[0;32mI (561) app_init: ELF file SHA256:  cb7a14480...[0m
+[0;32mI (566) app_init: ESP-IDF:          v6.0-dev-2980-gab149384e1[0m
+[0;32mI (571) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (575) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (579) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (583) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (589) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (594) heap_init: At 3FFC8EB0 len 00017150 (92 KiB): DRAM[0m
+[0;32mI (599) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (605) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (610) heap_init: At 40098FA0 len 00007060 (28 KiB): IRAM[0m
+[0;33mW (617) spi_flash: Detected boya flash chip but using generic driver. For optimal functionality, enable `SPI_FLASH_SUPPORT_BOYA_CHIP` in menuconfig[0m
+[0;32mI (629) spi_flash: detected chip: generic[0m
+[0;32mI (632) spi_flash: flash io: dio[0m
+[0;33mW (635) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (649) main_task: Started on CPU0[0m
+[0;32mI (659) main_task: Calling app_main()[0m
+[0;32mI (689) example: Turn off LCD backlight[0m
+[0;32mI (689) example: Initialize SPI bus[0m
+[0;32mI (689) example: Install panel IO[0m
+[0;32mI (689) example: Install ST7789 panel driver[0m
+[0;32mI (809) example: Turn on LCD backlight[0m
+[0;32mI (809) example: Initialize LVGL library[0m
+[0;32mI (809) example: Install LVGL tick timer[0m
+[0;32mI (809) example: Register io panel event callback for LVGL flush ready notification[0m
+[0;32mI (819) example: Create LVGL task[0m
+[0;32mI (819) example: Starting LVGL task[0m
+[0;32mI (889) example: Display LVGL Meter Widget[0m
+[0;32mI (899) example: Create Stopwatch Update Task[0m
+[0;32mI (899) example: Boot count: 2[0m
+[0;32mI (899) example: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (899) wifi station: ESP_WIFI_MODE_STA[0m
+[0;32mI (919) wifi:wifi driver task: 3ffd572c, prio:23, stack:6656, core=0[0m
+[0;32mI (929) wifi:wifi firmware version: d651973[0m
+[0;32mI (929) wifi:wifi certification version: v7.0[0m
+[0;32mI (929) wifi:config NVS flash: enabled[0m
+[0;32mI (929) wifi:config nano formatting: disabled[0m
+[0;32mI (939) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (939) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (949) wifi:Init management short buffer num: 32[0m
+[0;32mI (949) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (949) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (959) wifi:Init static rx buffer num: 10[0m
+[0;32mI (959) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (969) wifi_init: rx ba win: 6[0m
+[0;32mI (969) wifi_init: accept mbox: 6[0m
+[0;32mI (969) wifi_init: tcpip mbox: 32[0m
+[0;32mI (979) wifi_init: udp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp mbox: 6[0m
+[0;32mI (979) wifi_init: tcp tx win: 5760[0m
+[0;32mI (979) wifi_init: tcp rx win: 5760[0m
+[0;32mI (989) wifi_init: tcp mss: 1440[0m
+[0;32mI (989) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (989) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (999) phy_init: phy_version 4861,b71b5ad,Aug  5 2025,11:16:06[0m
+[0;32mI (1019) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (1019) wifi:enable tsf[0m
+[0;32mI (1019) wifi station: wifi_init_sta finished.[0m
+[0;32mI (1039) wifi:new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (1039) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (1059) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (1059) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (1089) wifi:connected with Converge_2.4GHz_g9C8, aid = 3, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (1089) wifi:security: WPA2-PSK, phy: bgn, rssi: -74[0m
+[0;32mI (1099) wifi:pm start, type: 1[0m
+
+[0;32mI (1099) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (1159) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (4279) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (4279) wifi station: got ip:192.168.100.114[0m
+[0;32mI (4279) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (4289) example: Initializing and starting SNTP[0m
+[0;32mI (4289) example: List of configured NTP servers:[0m
+[0;32mI (4289) example: server 0: pool.ntp.org[0m
+[0;32mI (6299) example: Waiting for system time to be set... (1/15)[0m
+[0;32mI (8299) example: Waiting for system time to be set... (2/15)[0m
+[0;32mI (8329) example: Notification of a time synchronization event[0m
+[0;32mI (8329) wifi:state: run -> init (0x0)[0m
+[0;32mI (8339) wifi:pm stop, total sleep time: 5588147 us / 7240550 us[0m
+
+[0;32mI (8339) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (8349) wifi station: retry to connect to the AP[0m
+[0;32mI (8349) wifi station: connect to the AP fail[0m
+[0;32mI (8359) wifi:flush txq[0m
+[0;32mI (8359) wifi:stop sw txq[0m
+[0;32mI (8359) wifi:lmac stop hw txq[0m
+[0;32mI (8369) wifi:Deinit lldesc rx mblock:10[0m
+[0;32mI (8379) example: The current date/time in New York is: Wed Nov  5 09:34:52 2025[0m
+[0;32mI (8379) example: The current date/time in Metro Manila is: Wed Nov  5 22:34:52 2025[0m
+[0;32mI (8379) example: Entering deep sleep for 10 seconds[0m

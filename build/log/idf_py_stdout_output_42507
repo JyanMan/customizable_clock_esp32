@@ -1,0 +1,23 @@
+Command: ninja all
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/bootloader && /home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python /home/juanman/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x1000 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/bootloader/bootloader.bin
+Bootloader binary size 0x66b0 bytes. 0x950 bytes (8%) free.
+[2/10] No install step for 'bootloader'
+[3/10] Completed 'bootloader'
+[4/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/src/lcd_lvgl_setup.c.obj
+[5/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/src/sntp_setup.c.obj
+In file included from /home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/sntp_setup.c:28:
+/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/include/clock_stopwatch.h:4:16: warning: 'lvgl_api_lock' defined but not used [-Wunused-variable]
+    4 | static _lock_t lvgl_api_lock;
+      |                ^~~~~~~~~~~~~
+[6/10] Linking C static library esp-idf/main/libmain.a
+[7/10] Generating esp-idf/esp_system/ld/sections.ld
+[8/10] Linking CXX executable spi_lcd_touch.elf
+[9/10] Generating binary image from built executable
+esptool v5.1.0
+Creating ESP32 image...
+Merged 3 ELF sections.
+Successfully created ESP32 image.
+Generated /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/spi_lcd_touch.bin
+[10/10] cd /home/juanman/Programming/embedded_projects/customizable_digital_clock/build && /home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python /home/juanman/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/partition_table/partition-table.bin /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/spi_lcd_touch.bin
+spi_lcd_touch.bin binary size 0x116840 bytes. Smallest app partition is 0x177000 bytes. 0x607c0 bytes (26%) free.
