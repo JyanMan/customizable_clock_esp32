@@ -15,7 +15,6 @@
 #include "esp_attr.h"
 #include "esp_sleep.h"
 #include "nvs_flash.h"
-// #include "protocol_examples_common.h"
 #include "esp_netif_sntp.h"
 #include "lwip/ip_addr.h"
 #include "esp_sntp.h"
@@ -27,17 +26,11 @@
 
 #include "clock_stopwatch.h"
 
-static const char *TAG = "example";
+static const char *TAG = "sntp setup";
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 48
 #endif
-
-/* Variable holding number of times ESP32 restarted since first boot.
- * It is placed into RTC memory using RTC_DATA_ATTR and
- * maintains its value when ESP32 wakes from deep sleep.
- */
-RTC_DATA_ATTR static int boot_count = 0;
 
 static esp_err_t obtain_time(void);
 
@@ -58,8 +51,6 @@ void time_sync_notification_cb(struct timeval *tv)
 esp_err_t sntp_sync()
 {
     esp_err_t time_status = ESP_OK;
-    ++boot_count;
-    ESP_LOGI(TAG, "Boot count: %d", boot_count);
 
     time_t now;
     struct tm timeinfo;
