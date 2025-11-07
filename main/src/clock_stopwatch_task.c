@@ -21,8 +21,61 @@ void clock_stopwatch_update_time(uint32_t new_time_s) {
     time_diff_since_last_update = 0;
 }
 
+SemaphoreHandle_t semaphore_stopwatch;
+
+static bool example_timer_on_alarm_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+{
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(semaphore_stopwatch, &xHigherPriorityTaskWoken);
+    if (xHigherPriorityTaskWoken) {
+        portYIELD_FROM_ISR();
+    }
+    return false;
+}
+
+static void stopwatch_increment_timer_init() {
+
+    gptimer_handle_t gptimer = NULL;
+    gptimer_config_t timer_config = {
+        .clk_src = GPTIMER_CLK_SRC_DEFAULT, // Select the default clock source
+        .direction = GPTIMER_COUNT_UP,      // Counting direction is up
+        .resolution_hz = 1 * 1000 * 1000,   // Resolution is 1 MHz, i.e., 1 tick equals 1 microsecond
+    };
+    // Create a timer instance
+    ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &gptimer));
+
+    gptimer_alarm_config_t alarm_config = {
+        .reload_count = 0,      // When the alarm event occurs, the timer will automatically reload to 0
+        .alarm_count = 1000000, // Set the actual alarm period, since the resolution is 1us, 1000000 represents 1s
+        .flags.auto_reload_on_alarm = true, // Enable auto-reload function
+    };
+    // Set the timer's alarm action
+    ESP_ERROR_CHECK(gptimer_set_alarm_action(gptimer, &alarm_config));
+
+    gptimer_event_callbacks_t cbs = {
+        .on_alarm = example_timer_on_alarm_cb, // Call the user callback function when the alarm event occurs
+    };
+    // Register timer event callback functions, allowing user context to be carried
+    ESP_ERROR_CHECK(gptimer_register_event_callbacks(gptimer, &cbs, NULL));
+    // Enable the timer
+    ESP_ERROR_CHECK(gptimer_enable(gptimer));
+    // Start the timer
+    ESP_ERROR_CHECK(gptimer_start(gptimer));
+}
+
 void clock_stopwatch_task(void *params) {
+
+    semaphore_stopwatch = xSemaphoreCreateBinary();
+    if (!semaphore_stopwatch) {
+        ESP_LOGE(TAG, "insufficient heap memory for semaphore creation...");
+    }
+
+    stopwatch_increment_timer_init();
+
     for ( ;; ) {
+        if ( xSemaphoreTake( semaphore_stopwatch, portMAX_DELAY) == pdFALSE ) {
+            continue;
+        }
         // uint64_t curr_time = boot_time + (esp_timer_get_time() / 1000000ULL);
         lv_obj_t **p_label = (lv_obj_t **)params;
         time_diff_since_last_update += 1;
@@ -39,7 +92,7 @@ void clock_stopwatch_task(void *params) {
             lv_label_set_text(label, str);
             _lock_release(&lvgl_api_lock);
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        // vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
