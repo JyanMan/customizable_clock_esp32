@@ -94,9 +94,9 @@
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_vfs_console/libesp_vfs_console.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/lwip/liblwip.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_netif/libesp_netif.a
-/home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/wpa_supplicant/libwpa_supplicant.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_coex/libesp_coex.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_wifi/libesp_wifi.a
+/home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/wpa_supplicant/libwpa_supplicant.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_driver_gptimer/libesp_driver_gptimer.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/driver/libdriver.a
 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/esp_driver_i2c/libesp_driver_i2c.a

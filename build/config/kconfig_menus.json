@@ -5119,8 +5119,8 @@
                         "children": [],
                         "depends_on": "<choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE>",
                         "help": null,
-                        "id": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HUNT_AND_PECK",
-                        "name": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HUNT_AND_PECK",
+                        "id": "ESP_STATION_WPA3_SAE_PWE_HUNT_AND_PECK",
+                        "name": "ESP_STATION_WPA3_SAE_PWE_HUNT_AND_PECK",
                         "range": null,
                         "title": "HUNT AND PECK",
                         "type": "bool"
@@ -5129,8 +5129,8 @@
                         "children": [],
                         "depends_on": "ESP_WIFI_ENABLE_SAE_H2E && <choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE>",
                         "help": null,
-                        "id": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HASH_TO_ELEMENT",
-                        "name": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HASH_TO_ELEMENT",
+                        "id": "ESP_STATION_WPA3_SAE_PWE_HASH_TO_ELEMENT",
+                        "name": "ESP_STATION_WPA3_SAE_PWE_HASH_TO_ELEMENT",
                         "range": null,
                         "title": "H2E",
                         "type": "bool"
@@ -5139,8 +5139,8 @@
                         "children": [],
                         "depends_on": "ESP_WIFI_ENABLE_SAE_H2E && <choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE> && <choice ESP_WIFI_SAE_MODE>",
                         "help": null,
-                        "id": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_BOTH",
-                        "name": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_BOTH",
+                        "id": "ESP_STATION_WPA3_SAE_PWE_BOTH",
+                        "name": "ESP_STATION_WPA3_SAE_PWE_BOTH",
                         "range": null,
                         "title": "BOTH",
                         "type": "bool"
@@ -5155,7 +5155,7 @@
             },
             {
                 "children": [],
-                "depends_on": "ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HASH_TO_ELEMENT || ESP_STATION_EXAMPLE_WPA3_SAE_PWE_BOTH",
+                "depends_on": "ESP_STATION_WPA3_SAE_PWE_HASH_TO_ELEMENT || ESP_STATION_WPA3_SAE_PWE_BOTH",
                 "help": "password identifier for SAE H2E",
                 "id": "ESP_WIFI_PW_ID",
                 "name": "ESP_WIFI_PW_ID",

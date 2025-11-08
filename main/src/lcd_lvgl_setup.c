@@ -24,7 +24,7 @@
 
 #include "lcd_lvgl_setup.h"
 
-static const char *TAG = "example";
+static const char *TAG = "lcd lvgl setup";
 
 #define LCD_HOST  SPI2_HOST
 
@@ -235,16 +235,16 @@ void lcd_lvgl_setup()
     // Lock the mutex due to the LVGL APIs are not thread-safe
 
     // create clock label
-    static lv_obj_t *label;
+    static ClockStopwatchInfo stopwatch_info;
     _lock_acquire(&lvgl_api_lock);
-    label = lv_label_create(lv_screen_active());
-    clock_countdown_lvgl_ui(display, label);
+    clock_stopwatch_info_init(&stopwatch_info);
+    clock_countdown_lvgl_ui(display, &stopwatch_info);
     _lock_release(&lvgl_api_lock);
 
     // task for incrementing clock per second and update clock gui
     ESP_LOGI(TAG, "Create Stopwatch Update Task");
     xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-        &label, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
     xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
         NULL, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
 }

@@ -94,9 +94,9 @@ $<TARGET_FILE:idf::esp_driver_uart>
 $<TARGET_FILE:idf::esp_vfs_console>
 $<TARGET_FILE:idf::lwip>
 $<TARGET_FILE:idf::esp_netif>
-$<TARGET_FILE:idf::wpa_supplicant>
 $<TARGET_FILE:idf::esp_coex>
 $<TARGET_FILE:idf::esp_wifi>
+$<TARGET_FILE:idf::wpa_supplicant>
 $<TARGET_FILE:idf::esp_driver_gptimer>
 $<TARGET_FILE:idf::driver>
 $<TARGET_FILE:idf::esp_driver_i2c>

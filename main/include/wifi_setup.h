@@ -3,7 +3,8 @@
 
 #include "esp_err.h"
 
-esp_err_t wifi_full_enable();
-void wifi_full_disable();
+esp_err_t wifi_full_init();
+esp_err_t wifi_start_scan();
+esp_err_t wifi_stop_scan();
 
 #endif

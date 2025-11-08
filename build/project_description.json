@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "spi_lcd_touch",
-    "project_version":    "3f3f8d3-dirty",
+    "project_version":    "135d372-dirty",
     "project_path":       "/home/juanman/Programming/embedded_projects/customizable_digital_clock",
     "idf_path":           "/home/juanman/esp/esp-idf",
     "build_dir":          "/home/juanman/Programming/embedded_projects/customizable_digital_clock/build",
@@ -831,11 +831,11 @@
             "type": "LIBRARY",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "wpa_supplicant", "esp_driver_gptimer", "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
+            "priv_reqs": [ "wpa_supplicant", "esp_wifi", "nvs_flash", "esp_driver_gptimer", "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
             "file": "/home/juanman/Programming/embedded_projects/customizable_digital_clock/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/main.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/clock_stopwatch_task.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/clock_stopwatch_ui.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/lcd_lvgl_setup.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/sntp_setup.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/wifi_setup.c" ],
+            "sources": [ "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/main.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/clock_stopwatch_info.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/clock_stopwatch_task.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/clock_stopwatch_ui.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/font_awesome.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/lcd_lvgl_setup.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/sntp_setup.c", "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main/src/wifi_setup.c" ],
             "include_dirs": [ "./include" ]
         },
         "mbedtls": {
@@ -2341,7 +2341,7 @@
             "dir": "/home/juanman/Programming/embedded_projects/customizable_digital_clock/main",
             "lib": "__idf_main",
             "reqs": [],
-            "priv_reqs": [ "esp_wifi", "nvs_flash", "wpa_supplicant", "esp_driver_gptimer", "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
+            "priv_reqs": [ "wpa_supplicant", "esp_wifi", "nvs_flash", "esp_driver_gptimer", "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
             "managed_reqs": [],
             "managed_priv_reqs": [ "atanisoft__esp_lcd_touch_xpt2046", "espressif__esp_lcd_touch_stmpe610", "lvgl__lvgl" ],
             "include_dirs": [ "./include" ]

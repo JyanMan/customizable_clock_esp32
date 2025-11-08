@@ -16,14 +16,14 @@ static volatile uint32_t time_diff_since_last_update = 0;
 
 static const char *TAG = "clock stopwatch task";
 
+static SemaphoreHandle_t semaphore_stopwatch;
+
 void clock_stopwatch_update_time(uint32_t new_time_s) {
     time_since_last_sntp_update = new_time_s;
     time_diff_since_last_update = 0;
 }
 
-SemaphoreHandle_t semaphore_stopwatch;
-
-static bool example_timer_on_alarm_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
+static bool stopwatch_increment_timer_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xSemaphoreGiveFromISR(semaphore_stopwatch, &xHigherPriorityTaskWoken);
@@ -53,7 +53,7 @@ static void stopwatch_increment_timer_init() {
     ESP_ERROR_CHECK(gptimer_set_alarm_action(gptimer, &alarm_config));
 
     gptimer_event_callbacks_t cbs = {
-        .on_alarm = example_timer_on_alarm_cb, // Call the user callback function when the alarm event occurs
+        .on_alarm = stopwatch_increment_timer_cb, // Call the user callback function when the alarm event occurs
     };
     // Register timer event callback functions, allowing user context to be carried
     ESP_ERROR_CHECK(gptimer_register_event_callbacks(gptimer, &cbs, NULL));
@@ -77,23 +77,32 @@ void clock_stopwatch_task(void *params) {
             continue;
         }
         // uint64_t curr_time = boot_time + (esp_timer_get_time() / 1000000ULL);
-        lv_obj_t **p_label = (lv_obj_t **)params;
+        ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
         time_diff_since_last_update += 1;
-        if (p_label) {
+        if (stopwatch_info) {
             uint32_t local_time_s  = time_since_last_sntp_update + time_diff_since_last_update;
-            char str[16];
+
+            char local_time_str[16];
+            char sec_str[4];
+
             uint8_t hour = local_time_s / 3600;
             uint8_t min = (local_time_s % 3600) / 60;
             uint8_t sec = local_time_s % 60;
-            snprintf(str, 16, "%02d:%02d:%02d", hour, min, sec);
 
-            lv_obj_t *label = *p_label;
+            snprintf(local_time_str, 16, "%02d:%02d", hour, min);
+            snprintf(sec_str, 4, "%02d", sec);
+
             _lock_acquire(&lvgl_api_lock);
-            lv_label_set_text(label, str);
+            lv_label_set_text(stopwatch_info->time_label, local_time_str);
+            lv_label_set_text(stopwatch_info->sec_label, sec_str);
             _lock_release(&lvgl_api_lock);
         }
         // vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
+}
+
+void clock_stopwatch_sync_weather_task(void *params) {
+    
 }
 
 void clock_stopwatch_sync_sntp_task(void *params) {
@@ -104,7 +113,6 @@ void clock_stopwatch_sync_sntp_task(void *params) {
         sync_retries++;
     }
     for ( ;; ) {
-        uint8_t hours_since_update = time_diff_since_last_update / ONE_HOUR_IN_SEC;
         if (sync_retries >= 5) {
             ESP_LOGE(TAG, "unable to sync after %d retries", retry_sec);
             sync_retries = 0;
@@ -119,6 +127,8 @@ void clock_stopwatch_sync_sntp_task(void *params) {
                 sync_retries = 0;
             }
         }
+
+        uint8_t hours_since_update = time_diff_since_last_update / ONE_HOUR_IN_SEC;
         if (hours_since_update >= 24) {
             if (sntp_sync() == ESP_ERR_TIMEOUT) {
                 sync_retries++;

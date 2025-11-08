@@ -173,7 +173,7 @@ static esp_err_t obtain_time(void)
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
      * examples/protocols/README.md for more information about this function.
      */
-    ESP_ERROR_CHECK(wifi_full_enable());
+    ESP_ERROR_CHECK(wifi_start_scan());
 
 #if LWIP_DHCP_GET_NTP_SRV
     ESP_LOGI(TAG, "Starting SNTP");
@@ -227,7 +227,7 @@ static esp_err_t obtain_time(void)
     time(&now);
     localtime_r(&now, &timeinfo);
 
-    wifi_full_disable();
+    wifi_stop_scan();
     esp_netif_sntp_deinit();
 
     return status;

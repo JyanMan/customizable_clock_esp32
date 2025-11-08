@@ -749,15 +749,15 @@ CONFIG_PARTITION_TABLE_MD5=y
 #
 # Configuration
 #
-CONFIG_ESP_WIFI_SSID="Jeeyan"
-CONFIG_ESP_WIFI_PASSWORD="fubyudono"
+CONFIG_ESP_WIFI_SSID="Converge_2.4GHz_g9C8"
+CONFIG_ESP_WIFI_PASSWORD="quT5uCJM"
 CONFIG_ESP_MAXIMUM_RETRY=3
 # default:
-# CONFIG_ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HUNT_AND_PECK is not set
+# CONFIG_ESP_STATION_WPA3_SAE_PWE_HUNT_AND_PECK is not set
 # default:
-# CONFIG_ESP_STATION_EXAMPLE_WPA3_SAE_PWE_HASH_TO_ELEMENT is not set
+# CONFIG_ESP_STATION_WPA3_SAE_PWE_HASH_TO_ELEMENT is not set
 # default:
-CONFIG_ESP_STATION_EXAMPLE_WPA3_SAE_PWE_BOTH=y
+CONFIG_ESP_STATION_WPA3_SAE_PWE_BOTH=y
 # default:
 CONFIG_ESP_WIFI_PW_ID=""
 # default:
@@ -776,6 +776,14 @@ CONFIG_ESP_WIFI_AUTH_WPA2_PSK=y
 # CONFIG_ESP_WIFI_AUTH_WPA2_WPA3_PSK is not set
 # default:
 # CONFIG_ESP_WIFI_AUTH_WAPI_PSK is not set
+# default:
+CONFIG_SNTP_TIME_SERVER="pool.ntp.org"
+# default:
+CONFIG_SNTP_TIME_SYNC_METHOD_IMMED=y
+# default:
+# CONFIG_SNTP_TIME_SYNC_METHOD_SMOOTH is not set
+# default:
+# CONFIG_SNTP_TIME_SYNC_METHOD_CUSTOM is not set
 # end of Configuration
 
 #
@@ -963,6 +971,21 @@ CONFIG_ESP_ERR_TO_NAME_LOOKUP=y
 # default:
 # CONFIG_GPIO_CTRL_FUNC_IN_IRAM is not set
 # end of ESP-Driver:GPIO Configurations
+
+#
+# ESP-Driver:GPTimer Configurations
+#
+# default:
+CONFIG_GPTIMER_ISR_HANDLER_IN_IRAM=y
+# default:
+# CONFIG_GPTIMER_CTRL_FUNC_IN_IRAM is not set
+# default:
+# CONFIG_GPTIMER_ISR_CACHE_SAFE is not set
+# default:
+CONFIG_GPTIMER_OBJ_CACHE_SAFE=y
+# default:
+# CONFIG_GPTIMER_ENABLE_DEBUG_LOG is not set
+# end of ESP-Driver:GPTimer Configurations
 
 #
 # ESP-Driver:I2C Configurations
