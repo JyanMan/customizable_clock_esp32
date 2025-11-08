@@ -5,9 +5,15 @@
 #include "sys/lock.h"
 
 LV_FONT_DECLARE(FontAwesome);
-#define LV_SYMBOL_SUN "\xEF\x86\x85"
-#define LV_SYMBOL_CLOUD_SHOWERS_HEAVY "\xEF\x9D\x80"
-#define LV_SYMBOL_CLOUD_SUN_RAIN "\xEF\x9D\x83"
+/* 0xf0e9, 0xf73d, 0xf743, 0xf185, 0xf72e, 0xf743, 0xf73c, 0xf75a, 0xf740 */
+/* LVSYMBOL are in HEX UTF8 bytes */
+#define LV_SYMBOL_SUN "\xEF\x86\x85" // 0xf185
+#define LV_SYMBOL_CLOUD_SHOWERS_HEAVY "\xEF\x9D\x80" // 0xf740
+#define LV_SYMBOL_CLOUD_SUN_RAIN "\xEF\x9D\x83" // 0xf743
+#define LV_SYMBOL_CLOUD_MOON_RAIN "\xEF\x9C\xBC" // 0xf73c
+#define LV_SYMBOL_POO_STORM "\xEF\x9D\x9A" // 0xf75a
+#define LV_SYMBOL_CLOUD_RAIN "\xEF\x9C\xBD" // 0xf73d
+#define LV_SYMBOL_WIND "\xEF\x9C\xAE" // 0xf72e
 
 typedef struct ClockStopwatchInfo {
     lv_obj_t *time_label;
