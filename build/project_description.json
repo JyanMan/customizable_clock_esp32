@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "spi_lcd_touch",
-    "project_version":    "135d372-dirty",
+    "project_version":    "9cd32f6-dirty",
     "project_path":       "/home/juanman/Programming/embedded_projects/customizable_digital_clock",
     "idf_path":           "/home/juanman/esp/esp-idf",
     "build_dir":          "/home/juanman/Programming/embedded_projects/customizable_digital_clock/build",

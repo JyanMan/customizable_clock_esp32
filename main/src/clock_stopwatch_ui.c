@@ -50,7 +50,7 @@ static void clock_sec_label(lv_obj_t *label) {
     lv_obj_add_style(label, &label_style, LV_PART_MAIN);
     lv_label_set_text(label, "00");
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0x504945), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_CENTER, 100, 18);
+    lv_obj_align(label, LV_ALIGN_CENTER, 100, 20);
 }
 
 static void clock_weather_label(lv_obj_t *label) {
@@ -70,9 +70,9 @@ static void clock_weather_label(lv_obj_t *label) {
     lv_style_set_text_font(&label_style, &FontAwesome);
 
     lv_obj_add_style(label, &label_style, LV_PART_MAIN);
-    lv_label_set_text(label, LV_SYMBOL_SUN);
+    lv_label_set_text(label, LV_SYMBOL_CLOUD_SUN_RAIN);
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0x504945), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_CENTER, 100, -18);
+    lv_obj_align(label, LV_ALIGN_CENTER, 100, -25);
 }
 
 void clock_countdown_lvgl_ui(lv_display_t *disp, ClockStopwatchInfo *stopwatch_info) {

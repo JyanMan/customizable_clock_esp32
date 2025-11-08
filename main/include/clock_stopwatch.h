@@ -6,6 +6,8 @@
 
 LV_FONT_DECLARE(FontAwesome);
 #define LV_SYMBOL_SUN "\xEF\x86\x85"
+#define LV_SYMBOL_CLOUD_SHOWERS_HEAVY "\xEF\x9D\x80"
+#define LV_SYMBOL_CLOUD_SUN_RAIN "\xEF\x9D\x83"
 
 typedef struct ClockStopwatchInfo {
     lv_obj_t *time_label;

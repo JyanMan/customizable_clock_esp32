@@ -1,0 +1,254 @@
+Command: /home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python /home/juanman/esp/esp-idf/tools/idf_monitor.py -p /dev/ttyUSB0 -b 115200 --toolchain-prefix xtensa-esp32-elf- --target esp32 --revision 0 /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/spi_lcd_touch.elf /home/juanman/Programming/embedded_projects/customizable_digital_clock/build/bootloader/bootloader.elf -m '/home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python' '/home/juanman/esp/esp-idf/tools/idf.py'
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0040,len:6376
+load:0x40078000,len:15900
+ho 0 tail 12 room 4
+load:0x40080400,len:3920
+entry 0x40080644
+[0;32mI (29) boot: ESP-IDF v6.0-dev-2980-gab149384e1 2nd stage bootloader[0m
+[0;32mI (29) boot: compile time Nov  8 2025 09:08:43[0m
+[0;32mI (29) boot: Multicore bootloader[0m
+[0;32mI (32) boot: chip revision: v3.1[0m
+[0;32mI (35) boot.esp32: SPI Speed      : 40MHz[0m
+[0;32mI (39) boot.esp32: SPI Mode       : DIO[0m
+[0;32mI (42) boot.esp32: SPI Flash Size : 2MB[0m
+[0;32mI (46) boot: Enabling RNG early entropy source...[0m
+[0;32mI (50) boot: Partition Table:[0m
+[0;32mI (53) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (59) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (66) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (72) boot:  2 factory          factory app      00 00 00010000 00177000[0m
+[0;32mI (79) boot: End of partition table[0m
+[0;32mI (82) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=3e858h (256088) map[0m
+[0;32mI (181) esp_image: segment 1: paddr=0004e880 vaddr=3ffb0000 size=01798h (  6040) load[0m
+[0;32mI (183) esp_image: segment 2: paddr=00050020 vaddr=400d0020 size=d0b30h (854832) map[0m
+[0;32mI (489) esp_image: segment 3: paddr=00120b58 vaddr=3ffb1798 size=02be4h ( 11236) load[0m
+[0;32mI (494) esp_image: segment 4: paddr=00123744 vaddr=40080000 size=17764h ( 96100) load[0m
+[0;32mI (533) esp_image: segment 5: paddr=0013aeb0 vaddr=50000000 size=00024h (    36) load[0m
+[0;32mI (545) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (545) boot: Disabling RNG early entropy source...[0m
+[0;32mI (556) cpu_start: Multicore app[0m
+[0;32mI (564) cpu_start: GPIO 3 and 1 are used as console UART I/O pins[0m
+[0;32mI (564) cpu_start: Pro cpu start user code[0m
+[0;32mI (565) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (566) app_init: Application information:[0m
+[0;32mI (570) app_init: Project name:     spi_lcd_touch[0m
+[0;32mI (575) app_init: App version:      9cd32f6-dirty[0m
+[0;32mI (579) app_init: Compile time:     Nov  8 2025 09:59:13[0m
+[0;32mI (584) app_init: ELF file SHA256:  e9c3fd1ec...[0m
+[0;32mI (588) app_init: ESP-IDF:          v6.0-dev-2980-gab149384e1[0m
+[0;32mI (594) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (598) efuse_init: Max chip rev:     v3.99 [0m
+[0;32mI (602) efuse_init: Chip rev:         v3.1[0m
+[0;32mI (606) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (612) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM[0m
+[0;32mI (617) heap_init: At 3FFC8EB0 len 00017150 (92 KiB): DRAM[0m
+[0;32mI (622) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM[0m
+[0;32mI (627) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM[0m
+[0;32mI (633) heap_init: At 40097764 len 0000889C (34 KiB): IRAM[0m
+[0;33mW (640) spi_flash: Detected boya flash chip but using generic driver. For optimal functionality, enable `SPI_FLASH_SUPPORT_BOYA_CHIP` in menuconfig[0m
+[0;32mI (651) spi_flash: detected chip: generic[0m
+[0;32mI (655) spi_flash: flash io: dio[0m
+[0;33mW (658) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (672) main_task: Started on CPU0[0m
+[0;32mI (682) main_task: Calling app_main()[0m
+[0;32mI (702) wifi station: ESP_WIFI_MODE_STA[0m
+[0;32mI (712) wifi:wifi driver task: 3ffd0e44, prio:23, stack:6656, core=0[0m
+[0;32mI (722) wifi:wifi firmware version: d651973[0m
+[0;32mI (722) wifi:wifi certification version: v7.0[0m
+[0;32mI (722) wifi:config NVS flash: enabled[0m
+[0;32mI (722) wifi:config nano formatting: disabled[0m
+[0;32mI (732) wifi:Init data frame dynamic rx buffer num: 32[0m
+[0;32mI (732) wifi:Init static rx mgmt buffer num: 5[0m
+[0;32mI (742) wifi:Init management short buffer num: 32[0m
+[0;32mI (742) wifi:Init dynamic tx buffer num: 32[0m
+[0;32mI (742) wifi:Init static rx buffer size: 1600[0m
+[0;32mI (752) wifi:Init static rx buffer num: 10[0m
+[0;32mI (752) wifi:Init dynamic rx buffer num: 32[0m
+[0;32mI (762) wifi_init: rx ba win: 6[0m
+[0;32mI (762) wifi_init: accept mbox: 6[0m
+[0;32mI (762) wifi_init: tcpip mbox: 32[0m
+[0;32mI (762) wifi_init: udp mbox: 6[0m
+[0;32mI (772) wifi_init: tcp mbox: 6[0m
+[0;32mI (772) wifi_init: tcp tx win: 5760[0m
+[0;32mI (772) wifi_init: tcp rx win: 5760[0m
+[0;32mI (782) wifi_init: tcp mss: 1440[0m
+[0;32mI (782) wifi_init: WiFi IRAM OP enabled[0m
+[0;32mI (782) wifi_init: WiFi RX IRAM OP enabled[0m
+[0;32mI (792) phy_init: phy_version 4861,b71b5ad,Aug  5 2025,11:16:06[0m
+[0;32mI (872) phy_init: Saving new calibration data due to checksum failure or outdated calibration data, mode(0)[0m
+[0;32mI (952) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (952) wifi:enable tsf[0m
+[0;32mI (952) wifi station: wifi_init_sta finished.[0m
+[0;32mI (972) wifi:new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (972) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (982) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (1012) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (1022) wifi:connected with Converge_2.4GHz_g9C8, aid = 1, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (1022) wifi:security: WPA2-PSK, phy: bgn, rssi: -80[0m
+[0;32mI (1032) wifi:pm start, type: 1[0m
+
+[0;32mI (1032) wifi:dp: 1, bi: 102400, li: 3, scale listen interval from 307200 us to 307200 us[0m
+[0;32mI (1042) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (4252) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (4252) wifi station: got ip:192.168.100.114[0m
+[0;32mI (4252) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (4262) lcd lvgl setup: Turn off LCD backlight[0m
+[0;32mI (4262) lcd lvgl setup: Initialize SPI bus[0m
+[0;32mI (4262) lcd lvgl setup: Install panel IO[0m
+[0;32mI (4272) lcd lvgl setup: Install ST7789 panel driver[0m
+[0;32mI (4392) lcd lvgl setup: Turn on LCD backlight[0m
+[0;32mI (4392) lcd lvgl setup: Initialize LVGL library[0m
+[0;32mI (4392) lcd lvgl setup: Install LVGL tick timer[0m
+[0;32mI (4402) lcd lvgl setup: Register io panel event callback for LVGL flush ready notification[0m
+[0;32mI (4402) lcd lvgl setup: Create LVGL task[0m
+[0;32mI (4402) lcd lvgl setup: Starting LVGL task[0m
+[0;32mI (4422) lcd lvgl setup: Display LVGL Meter Widget[0m
+[0;32mI (4492) lcd lvgl setup: Create Stopwatch Update Task[0m
+[0;32mI (4492) sntp setup: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (4502) main_task: Returned from app_main()[0m
+[0;32mI (4502) wifi station: wifi_init_sta finished.[0m
+[0;32mI (4502) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (4512) sntp setup: Initializing and starting SNTP[0m
+[0;32mI (4512) sntp setup: List of configured NTP servers:[0m
+[0;32mI (4522) sntp setup: server 0: pool.ntp.org[0m
+[0;32mI (6522) sntp setup: Waiting for system time to be set... (1/10)[0m
+[0;32mI (7292) wifi:<ba-add>idx:0 (ifx:0, 7a:eb:46:71:2d:94), tid:0, ssn:0, winSize:64[0m
+[0;32mI (8522) sntp setup: Waiting for system time to be set... (2/10)[0m
+[0;32mI (10522) sntp setup: Waiting for system time to be set... (3/10)[0m
+[0;32mI (12522) sntp setup: Waiting for system time to be set... (4/10)[0m
+[0;32mI (14522) sntp setup: Waiting for system time to be set... (5/10)[0m
+[0;32mI (16522) sntp setup: Waiting for system time to be set... (6/10)[0m
+[0;32mI (18522) sntp setup: Waiting for system time to be set... (7/10)[0m
+[0;32mI (20522) sntp setup: Waiting for system time to be set... (8/10)[0m
+[0;32mI (22522) sntp setup: Waiting for system time to be set... (9/10)[0m
+[0;32mI (22522) wifi:state: run -> init (0x0)[0m
+[0;32mI (22532) wifi:pm stop, total sleep time: 18946907 us / 21496795 us[0m
+
+[0;32mI (22532) wifi:<ba-del>idx:0, tid:0[0m
+[0;32mI (22532) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (22542) wifi station: retry to connect to the AP[0m
+[0;32mI (22542) wifi station: connect to the AP fail[0m
+[0;32mI (22582) wifi:flush txq[0m
+[0;32mI (22582) wifi:stop sw txq[0m
+[0;32mI (22582) wifi:lmac stop hw txq[0m
+[0;32mI (22582) sntp setup: The current date/time in New York is: Wed Dec 31 19:00:22 1969[0m
+[0;32mI (22582) sntp setup: The current date/time in Metro Manila is: Thu Jan  1 08:00:22 1970[0m
+[0;32mI (22592) clock stopwatch task: unable to sync sntp... retrying in 5 sec[0m
+[0;32mI (27592) sntp setup: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (27592) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (27592) wifi:enable tsf[0m
+[0;32mI (27592) wifi station: wifi_init_sta finished.[0m
+[0;32mI (27592) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (27602) sntp setup: Initializing and starting SNTP[0m
+[0;32mI (27612) sntp setup: List of configured NTP servers:[0m
+[0;32mI (27612) wifi:I (27612) sntp setup: server 0: pool.ntp.org[0m
+new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0
+[0;32mI (27622) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (27642) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (27662) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (27682) wifi:connected with Converge_2.4GHz_g9C8, aid = 1, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (27682) wifi:security: WPA2-PSK, phy: bgn, rssi: -72[0m
+[0;32mI (27692) wifi:pm start, type: 1[0m
+
+[0;32mI (27762) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (29622) sntp setup: Waiting for system time to be set... (1/10)[0m
+[0;32mI (30862) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (30862) wifi station: got ip:192.168.100.114[0m
+[0;32mI (31622) sntp setup: Waiting for system time to be set... (2/10)[0m
+[0;32mI (33622) sntp setup: Waiting for system time to be set... (3/10)[0m
+[0;32mI (35622) sntp setup: Waiting for system time to be set... (4/10)[0m
+[0;32mI (37622) sntp setup: Waiting for system time to be set... (5/10)[0m
+[0;32mI (39622) sntp setup: Waiting for system time to be set... (6/10)[0m
+[0;32mI (41622) sntp setup: Waiting for system time to be set... (7/10)[0m
+[0;32mI (43622) sntp setup: Waiting for system time to be set... (8/10)[0m
+[0;32mI (45622) sntp setup: Waiting for system time to be set... (9/10)[0m
+[0;32mI (45622) wifi:state: run -> init (0x0)[0m
+[0;32mI (45632) wifi:pm stop, total sleep time: 15770506 us / 17940174 us[0m
+
+[0;32mI (45632) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (45632) wifi station: retry to connect to the AP[0m
+[0;32mI (45632) wifi station: connect to the AP fail[0m
+[0;32mI (45682) wifi:flush txq[0m
+[0;32mI (45682) wifi:stop sw txq[0m
+[0;32mI (45682) wifi:lmac stop hw txq[0m
+[0;32mI (45682) sntp setup: The current date/time in New York is: Wed Dec 31 19:00:45 1969[0m
+[0;32mI (45682) sntp setup: The current date/time in Metro Manila is: Thu Jan  1 08:00:45 1970[0m
+[0;32mI (45692) clock stopwatch task: unable to sync sntp... retrying in 5 sec[0m
+[0;32mI (50692) sntp setup: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (50692) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (50692) wifi:enable tsf[0m
+[0;32mI (50692) wifi station: wifi_init_sta finished.[0m
+[0;32mI (50692) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (50702) sntp setup: Initializing and starting SNTP[0m
+[0;32mI (50712) wifi:new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0I (50712) sntp setup: List of configured NTP servers:[0m
+
+[0;32mI (50722) sntp setup: server 0: pool.ntp.org[0m
+[0;32mI (50722) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (50742) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (50772) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (50792) wifi:connected with Converge_2.4GHz_g9C8, aid = 1, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (50792) wifi:security: WPA2-PSK, phy: bgn, rssi: -73[0m
+[0;32mI (50802) wifi:pm start, type: 1[0m
+
+[0;32mI (50802) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (52722) sntp setup: Waiting for system time to be set... (1/10)[0m
+[0;32mI (53972) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (53972) wifi station: got ip:192.168.100.114[0m
+[0;32mI (54722) sntp setup: Waiting for system time to be set... (2/10)[0m
+[0;32mI (56722) sntp setup: Waiting for system time to be set... (3/10)[0m
+[0;32mI (58722) sntp setup: Waiting for system time to be set... (4/10)[0m
+[0;32mI (60722) sntp setup: Waiting for system time to be set... (5/10)[0m
+[0;32mI (62722) sntp setup: Waiting for system time to be set... (6/10)[0m
+[0;32mI (64722) sntp setup: Waiting for system time to be set... (7/10)[0m
+[0;32mI (66722) sntp setup: Waiting for system time to be set... (8/10)[0m
+[0;32mI (68722) sntp setup: Waiting for system time to be set... (9/10)[0m
+[0;32mI (68722) wifi:state: run -> init (0x0)[0m
+[0;32mI (68732) wifi:pm stop, total sleep time: 15913208 us / 17931133 us[0m
+
+[0;32mI (68732) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (68732) wifi station: retry to connect to the AP[0m
+[0;32mI (68742) wifi station: connect to the AP fail[0m
+[0;32mI (68782) wifi:flush txq[0m
+[0;32mI (68782) wifi:stop sw txq[0m
+[0;32mI (68782) wifi:lmac stop hw txq[0m
+[0;32mI (68782) sntp setup: The current date/time in New York is: Wed Dec 31 19:01:08 1969[0m
+[0;32mI (68782) sntp setup: The current date/time in Metro Manila is: Thu Jan  1 08:01:08 1970[0m
+[0;32mI (68792) clock stopwatch task: unable to sync sntp... retrying in 5 sec[0m
+[0;32mI (73792) sntp setup: Time is not set yet. Connecting to WiFi and getting time over NTP.[0m
+[0;32mI (73792) wifi:mode : sta (88:57:21:b2:ae:c4)[0m
+[0;32mI (73792) wifi:enable tsf[0m
+[0;32mI (73792) wifi station: wifi_init_sta finished.[0m
+[0;32mI (73792) wifi station: connected to ap SSID:Converge_2.4GHz_g9C8 password:quT5uCJM[0m
+[0;32mI (73802) sntp setup: Initializing and starting SNTP[0m
+[0;32mI (73812) sntp setup: List of configured NTP servers:[0m
+[0;32mI (73812) wifi:I (73812) sntp setup: server 0: pool.ntp.org[0m
+new:<8,0>, old:<1,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0
+[0;32mI (73822) wifi:state: init -> auth (0xb0)[0m
+[0;32mI (73852) wifi:state: auth -> assoc (0x0)[0m
+[0;32mI (73872) wifi:state: assoc -> run (0x10)[0m
+[0;32mI (73902) wifi:connected with Converge_2.4GHz_g9C8, aid = 1, channel 8, BW20, bssid = 7a:eb:46:71:2d:94[0m
+[0;32mI (73902) wifi:security: WPA2-PSK, phy: bgn, rssi: -67[0m
+[0;32mI (73912) wifi:pm start, type: 1[0m
+
+[0;32mI (73952) wifi:AP's beacon interval = 102400 us, DTIM period = 1[0m
+[0;32mI (75822) sntp setup: Waiting for system time to be set... (1/10)[0m
+[0;32mI (77112) esp_netif_handlers: sta ip: 192.168.100.114, mask: 255.255.255.0, gw: 192.168.100.1[0m
+[0;32mI (77112) wifi station: got ip:192.168.100.114[0m
+[0;32mI (77702) sntp setup: Notification of a time synchronization event[0m
+[0;32mI (77712) wifi:state: run -> init (0x0)[0m
+[0;32mI (77722) wifi:pm stop, total sleep time: 2991330 us / 3811191 us[0m
+
+[0;32mI (77722) wifi:new:<8,0>, old:<8,0>, ap:<255,255>, sta:<8,0>, prof:1, snd_ch_cfg:0x0[0m
+[0;32mI (77722) wifi station: retry to connect to the AP[0m
+[0;32mI (77722) wifi station: connect to the AP fail[0m
+[0;32mI (77782) wifi:flush txq[0m
+[0;32mI (77782) wifi:stop sw txq[0m
+[0;32mI (77782) wifi:lmac stop hw txq[0m
+[0;32mI (77782) sntp setup: The current date/time in New York is: Fri Nov  7 21:14:24 2025[0m
+[0;32mI (77782) sntp setup: The current date/time in Metro Manila is: Sat Nov  8 10:14:24 2025[0m
