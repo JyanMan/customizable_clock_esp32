@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <sys/lock.h>
+#include <time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "clock_stopwatch.h"
@@ -8,18 +9,26 @@
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "driver/gptimer.h"
+#include "wifi_setup.h"
 
 #define ONE_HOUR_IN_SEC 3600
 
 static volatile uint32_t time_since_last_sntp_update = 22345;
 static volatile uint32_t time_diff_since_last_update = 0;
+static volatile uint16_t time_year = 0;
+static volatile uint8_t time_month = 0;
+static volatile uint8_t time_day = 0;
 
 static const char *TAG = "clock stopwatch task";
 
 static SemaphoreHandle_t semaphore_stopwatch;
 
-void clock_stopwatch_update_time(uint32_t new_time_s) {
-    time_since_last_sntp_update = new_time_s;
+void clock_stopwatch_update_time(struct tm* timeinfo) {
+    uint32_t local_time_sec = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
+    time_year = timeinfo->tm_year + 1900; // tm_year onnly returns 1900-year
+    time_month = timeinfo->tm_mon;
+    time_day = timeinfo->tm_mday;
+    time_since_last_sntp_update = local_time_sec;
     time_diff_since_last_update = 0;
 }
 
@@ -101,18 +110,56 @@ void clock_stopwatch_task(void *params) {
     }
 }
 
-void clock_stopwatch_sync_weather_task(void *params) {
-    
+static esp_err_t sync_weather(ClockStopwatchInfo *stopwatch_info) {
+    esp_err_t res = ESP_OK;
+
+    return res;
+}
+
+static void update_date_label(ClockStopwatchInfo *stopwatch_info) {
+    char date_str[32];
+
+    char *time_month_str;
+
+    switch (time_month) {
+        case 0:  time_month_str = "Jan"; break;
+        case 1:  time_month_str = "Feb"; break;
+        case 2:  time_month_str = "Mar"; break;
+        case 3:  time_month_str = "Apr"; break;
+        case 4:  time_month_str = "May"; break;
+        case 5:  time_month_str = "Jun"; break;
+        case 6:  time_month_str = "Jul"; break;
+        case 7:  time_month_str = "Aug"; break;
+        case 8:  time_month_str = "Sep"; break;
+        case 9:  time_month_str = "Oct"; break;
+        case 10: time_month_str = "Nov"; break;
+        case 11: time_month_str = "Dec"; break;
+        default: time_month_str = "Invalid"; break;
+    }
+
+    snprintf(date_str, 32, "%s, %02d %04d", time_month_str, time_day, time_year);
+
+    _lock_acquire(&lvgl_api_lock);
+    lv_label_set_text(stopwatch_info->date_label, date_str);
+    _lock_release(&lvgl_api_lock);
 }
 
 void clock_stopwatch_sync_sntp_task(void *params) {
+
     static volatile uint8_t sync_retries = 0;
     static const uint8_t retry_sec = 5;
+
+    ESP_ERROR_CHECK(wifi_full_init());
+
     // sync on boot
     if (sntp_sync() == ESP_ERR_TIMEOUT) {
         sync_retries++;
     }
     for ( ;; ) {
+
+        ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
+        update_date_label(stopwatch_info);
+
         if (sync_retries >= 5) {
             ESP_LOGE(TAG, "unable to sync after %d retries", retry_sec);
             sync_retries = 0;
@@ -135,6 +182,8 @@ void clock_stopwatch_sync_sntp_task(void *params) {
                 continue;
             }
         }
+
+
         vTaskDelay((ONE_HOUR_IN_SEC * 1000) / portTICK_PERIOD_MS);
     }
 }

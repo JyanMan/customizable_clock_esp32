@@ -603,7 +603,7 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
 C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS:INTERNAL=1
 //Details about finding Git
-FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/usr/bin/git][v2.51.1()]
+FIND_PACKAGE_MESSAGE_DETAILS_Git:INTERNAL=[/usr/bin/git][v2.51.2()]
 //Details about finding Python3
 FIND_PACKAGE_MESSAGE_DETAILS_Python3:INTERNAL=[/home/juanman/.espressif/python_env/idf6.0_py3.13_env/bin/python][found components: Interpreter ][v3.13.7()]
 //Details about finding Threads

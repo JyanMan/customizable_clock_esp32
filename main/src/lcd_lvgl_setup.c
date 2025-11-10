@@ -135,8 +135,7 @@ static void lvgl_port_task(void *arg)
     }
 }
 
-void lcd_lvgl_setup()
-{
+void lcd_lvgl_setup() {
     ESP_LOGI(TAG, "Turn off LCD backlight");
     gpio_config_t bk_gpio_config = {
         .mode = GPIO_MODE_OUTPUT,
@@ -246,5 +245,5 @@ void lcd_lvgl_setup()
     xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
         &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
     xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-        NULL, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
 }

@@ -87,22 +87,12 @@ esp_err_t sntp_sync()
     char strftime_buf[64];
 
     time(&now); // TESTING PURPOSES
-
-    // Set timezone to Eastern Standard Time and print local time
-    setenv("TZ", "EST5EDT,M3.2.0/2,M11.1.0", 1);
-    tzset();
-    localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-    ESP_LOGI(TAG, "The current date/time in New York is: %s", strftime_buf);
-
+                //
     // Set timezone to Philippines Standard Time
     setenv("TZ", "PST-8", 1);
     tzset();
-
     localtime_r(&now, &timeinfo);
-
-    uint32_t local_time_sec = timeinfo.tm_hour * 3600 + (timeinfo.tm_min * 60) + (timeinfo.tm_sec); 
-    clock_stopwatch_update_time(local_time_sec);
+    clock_stopwatch_update_time(&timeinfo);
 
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGI(TAG, "The current date/time in Metro Manila is: %s", strftime_buf);
