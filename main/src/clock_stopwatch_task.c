@@ -13,8 +13,9 @@
 
 #define ONE_HOUR_IN_SEC 3600
 
-static volatile uint32_t time_since_last_sntp_update = 22345;
-static volatile uint32_t time_diff_since_last_update = 0;
+static volatile uint32_t local_time_s = 0;
+// static volatile uint32_t time_since_last_sntp_update = 0;
+// static volatile uint32_t time_diff_since_last_update = 0;
 static volatile uint16_t time_year = 0;
 static volatile uint8_t time_month = 0;
 static volatile uint8_t time_day = 0;
@@ -24,12 +25,12 @@ static const char *TAG = "clock stopwatch task";
 static SemaphoreHandle_t semaphore_stopwatch;
 
 void clock_stopwatch_update_time(struct tm* timeinfo) {
-    uint32_t local_time_sec = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
+    local_time_s = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
     time_year = timeinfo->tm_year + 1900; // tm_year onnly returns 1900-year
     time_month = timeinfo->tm_mon;
     time_day = timeinfo->tm_mday;
-    time_since_last_sntp_update = local_time_sec;
-    time_diff_since_last_update = 0;
+    // time_since_last_sntp_update = local_time_sec;
+    // time_diff_since_last_update = 0;
 }
 
 static bool stopwatch_increment_timer_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
@@ -85,11 +86,11 @@ void clock_stopwatch_task(void *params) {
         if ( xSemaphoreTake( semaphore_stopwatch, portMAX_DELAY) == pdFALSE ) {
             continue;
         }
-        // uint64_t curr_time = boot_time + (esp_timer_get_time() / 1000000ULL);
         ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
-        time_diff_since_last_update += 1;
+        // time_diff_since_last_update += 1;
+        local_time_s += 1;
         if (stopwatch_info) {
-            uint32_t local_time_s  = time_since_last_sntp_update + time_diff_since_last_update;
+            // uint32_t local_time_s  = time_since_last_sntp_update + time_diff_since_last_update;
 
             char local_time_str[16];
             char sec_str[4];
@@ -175,14 +176,14 @@ void clock_stopwatch_sync_sntp_task(void *params) {
             }
         }
 
-        uint8_t hours_since_update = time_diff_since_last_update / ONE_HOUR_IN_SEC;
-        if (hours_since_update >= 24) {
+        // uint8_t hours_since_update = time_diff_since_last_update / ONE_HOUR_IN_SEC;
+        uint8_t local_hours = local_time_s / ONE_HOUR_IN_SEC;
+        if (local_hours == 0 || local_hours == 1) {
             if (sntp_sync() == ESP_ERR_TIMEOUT) {
                 sync_retries++;
                 continue;
             }
         }
-
 
         vTaskDelay((ONE_HOUR_IN_SEC * 1000) / portTICK_PERIOD_MS);
     }
