@@ -1,29 +1,112 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QStackedLayout
+from PyQt6.QtGui import QColor, QPalette
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtCore import Qt
+
 
 import sys
 import threading
 import queue
 
 
+class Color(QWidget):
+    def __init__(self, color):
+        super().__init__()
+        self.setAutoFillBackground(True)
+
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(color))
+        self.setPalette(palette)
+
+        
+class MouseState:
+    prev_x: int = 0
+    prev_y: int = 0
+    x: int = 0
+    y: int = 0
+    drag: bool = False
+
+
+class TimerLabel(Color):
+    def __init__(self, color):
+        super().__init__(color)
+        self.setFixedSize(200, 100)
+        
+
+    def updateMouseDrag(self, mouse_state: MouseState, e):
+
+        # check if overlapping the box
+        timer_x = self.x()
+        timer_y = self.y()
+        max_x = timer_x + self.width()
+        max_y = timer_y + self.height()
+
+        mouse_x = mouse_state.x
+        mouse_y = mouse_state.y
+        
+        if not (mouse_x > timer_x and mouse_x < max_x \
+            and mouse_y > timer_y and mouse_y < max_y):
+            mouse_state.drag = False
+            return;
+
+        if not mouse_state.drag:
+            return
+        
+        new_pos = e.position()
+
+        dir_x = new_pos.x() - mouse_x
+        dir_y = new_pos.y() - mouse_y
+        
+        mouse_state.prev_x = mouse_x
+        mouse_state.prev_y = mouse_y
+
+        mouse_state.x = new_pos.x()
+        mouse_state.y = new_pos.y()
+
+        self.move(timer_x + int(dir_x), timer_y + int(dir_y))
+
+
 class MainWindow(QMainWindow):
     def __init__(self, test_q):
         super().__init__()
 
+        self.mouse_state = MouseState
+
         self.test_q: queue.Queue = test_q
 
-        self.setWindowTitle("Clock Editor")
+        self.timer_label = TimerLabel("red")
+        
+        self.layout = QStackedLayout()
+        # layout.addWidget(Color("grey"))
+        self.layout.addWidget(self.timer_label)
+        self.layout.addWidget(Color("pink"))
 
-        button = QPushButton("Press Me!")
-        button.setCheckable(True)
-        button.clicked.connect(self.the_button_was_clicked)
+        self.layout.setCurrentIndex(2)
 
-        # Set the central widget of the Window.
-        self.setCentralWidget(button)
+        self.main_widget = QWidget()
+        self.main_widget.setLayout(self.layout)
+        self.setCentralWidget(self.main_widget)
 
-    def the_button_was_clicked(self):
-        print("Clicked from window!")
-        self.test_q.put_nowait(True)
 
+    def mouseMoveEvent(self, e):
+        self.timer_label.updateMouseDrag(self.mouse_state, e)
+
+
+    def mouseDoubleClickEvent(self, e):
+        self.mouse_state.drag = True
+
+        new_pos = e.position()
+        
+        self.mouse_state.x = new_pos.x()
+        self.mouse_state.y = new_pos.y()
+
+
+    def mouseReleaseEvent(self, e):
+        if self.mouse_state.drag:
+            self.test_q.put_nowait((self.timer_label.x(), self.timer_label.y()))
+
+        self.mouse_state.drag = False
+            
 
 def app_thread(test_q: queue.Queue):
     app = QApplication(sys.argv)
@@ -35,4 +118,5 @@ def app_thread(test_q: queue.Queue):
 
 
 if __name__ == "__main__":
-    app_thread()
+    q = queue.Queue()
+    app_thread(q)

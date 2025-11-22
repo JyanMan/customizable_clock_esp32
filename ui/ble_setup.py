@@ -74,11 +74,16 @@ async def ble_setup(args: Args, test_q: queue.Queue):
                     print("received")
                 test_q.task_done()
 
-                data_to_send = 0x01
+                # data_to_send: int =  result.x() | (result.y() << 16)
+                x16 = result[0] & 0xFFFF
+                y16 = result[1] & 0xFFFF
+
+                data_to_send = x16 | (y16 << 16)
+                data_bytes = data_to_send.to_bytes(4, byteorder="little", signed=False)
                 # if (data_to_send is None):
                 #     continue
 
-                await client.write_gatt_char(chr_uuid, bytes([data_to_send]), response=False)
+                await client.write_gatt_char(chr_uuid, data_bytes, response=False)
 
         logger.info("disconnecting...")
 

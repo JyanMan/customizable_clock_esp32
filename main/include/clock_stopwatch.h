@@ -4,6 +4,8 @@
 #include <time.h>
 #include "lvgl.h"
 #include "sys/lock.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 LV_FONT_DECLARE(FontAwesome);
 /* 0xf0e9, 0xf73d, 0xf743, 0xf185, 0xf72e, 0xf743, 0xf73c, 0xf75a, 0xf740 */
@@ -24,6 +26,7 @@ typedef struct ClockStopwatchInfo {
 } ClockStopwatchInfo;
 
 static _lock_t lvgl_api_lock;
+extern QueueHandle_t label_positions;
 
 void clock_stopwatch_info_init(ClockStopwatchInfo *csi);
 
