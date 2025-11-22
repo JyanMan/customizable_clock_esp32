@@ -9,45 +9,6 @@ from bleak import BleakScanner, BleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 
-import keyboard
-
-
-def check_for_key():
-    key_press = keyboard.read_key()
-    # hex values are defined in esp code
-    if (key_press == 'w'):
-        print("")
-        return 0x01
-    elif (key_press == 'a'):
-        print("")
-        return 0x02
-    elif (key_press == 's'):
-        print("")
-        return 0x03
-    elif (key_press == 'd'):
-        print("")
-        return 0x04
-    elif (key_press == 'q'):
-        print("")
-        return 0x05
-    elif (key_press == 'j'):
-        print("")
-        return 0x06
-    elif (key_press == 'k'):
-        print("")
-        return 0x07
-    else:
-        return None
-
-
-"""
-while True:
-    main()
-"""
-
-
-logger = logging.getLogger(__name__)
-
 
 class Args(argparse.Namespace):
     # name: Optional[str]
@@ -63,26 +24,16 @@ class Args(argparse.Namespace):
         self.macos_use_bdaddr = False
         self.pair = False
         self.debug = False
-
-        
-
+    
 
 async def ble_setup(args: Args, test_q: queue.Queue):
-#     args = parser.parse_args(namespace=Args())
-    # log_level = logging.DEBUG if args.debug else logging.INFO
-    # logging.basicConfig(
-    #     level=log_level,
-    #     format="%(asctime)-15s %(name)-8s %(levelname)s: %(message)s",
-    # )
-
-    # args = Args("NimBLE_GATT", None)
+    logger = logging.getLogger(__name__)
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(
         level=log_level,
         format="%(asctime)-15s %(name)-8s %(levelname)s: %(message)s",
     )
     logger.info("starting scan...")
-    print("asdfasdfasdfasdf")
 
     if args.name:
         device = await BleakScanner.find_device_by_name(
