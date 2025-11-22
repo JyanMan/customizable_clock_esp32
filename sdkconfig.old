@@ -893,6 +893,30 @@ CONFIG_COMPILER_CXX_GLIBCXX_CONSTEXPR_NO_CHANGE=y
 #
 
 #
+# Bluetooth
+#
+# default:
+# CONFIG_BT_ENABLED is not set
+
+#
+# Common Options
+#
+
+#
+# BLE Log
+#
+# default:
+# CONFIG_BLE_LOG_ENABLED is not set
+# end of BLE Log
+
+# default:
+# CONFIG_BT_BLE_LOG_SPI_OUT_ENABLED is not set
+# default:
+# CONFIG_BT_BLE_LOG_UHCI_OUT_ENABLED is not set
+# end of Common Options
+# end of Bluetooth
+
+#
 # Legacy Driver Configurations
 #
 
@@ -1048,6 +1072,19 @@ CONFIG_ESP_EVENT_POST_FROM_ISR=y
 # default:
 CONFIG_ESP_EVENT_POST_FROM_IRAM_ISR=y
 # end of Event Loop Library
+
+#
+# GDB Stub
+#
+# default:
+CONFIG_ESP_GDBSTUB_ENABLED=y
+# default:
+# CONFIG_ESP_SYSTEM_GDBSTUB_RUNTIME is not set
+# default:
+CONFIG_ESP_GDBSTUB_SUPPORT_TASKS=y
+# default:
+CONFIG_ESP_GDBSTUB_MAX_TASKS=32
+# end of GDB Stub
 
 #
 # Hardware Settings
@@ -1415,6 +1452,8 @@ CONFIG_ESP_SYSTEM_IN_IRAM=y
 CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT=y
 # default:
 # CONFIG_ESP_SYSTEM_PANIC_SILENT_REBOOT is not set
+# default:
+# CONFIG_ESP_SYSTEM_PANIC_GDBSTUB is not set
 # default:
 CONFIG_ESP_SYSTEM_PANIC_REBOOT_DELAY_SECONDS=0
 # default:
