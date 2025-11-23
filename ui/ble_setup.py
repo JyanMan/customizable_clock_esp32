@@ -80,8 +80,8 @@ async def ble_setup(args: Args, test_q: queue.Queue):
 
                 data_to_send = x16 | (y16 << 16)
                 data_bytes = data_to_send.to_bytes(4, byteorder="little", signed=False)
-                # if (data_to_send is None):
-                #     continue
+
+                print(f"sent bytes -> x: {x16}, y: {y16}, combined: {data_bytes}")
 
                 await client.write_gatt_char(chr_uuid, data_bytes, response=False)
 

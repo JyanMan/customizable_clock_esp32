@@ -75,7 +75,7 @@ static void stopwatch_increment_timer_init() {
 }
 
 void clock_stopwatch_task(void *params) {
-    label_positions = xQueueCreate(10, sizeof(uint8_t));
+    label_positions = xQueueCreate(10, sizeof(uint32_t));
 
     semaphore_stopwatch = xSemaphoreCreateBinary();
     if (!semaphore_stopwatch) {
@@ -96,12 +96,13 @@ void clock_stopwatch_task(void *params) {
         if (stopwatch_info) {
             uint32_t signal_val;
 
-            if( xQueueReceive( label_positions, &( signal_val ), ( TickType_t ) 10 ) == pdPASS ) {
+            if( xQueueReceive( label_positions, &( signal_val ), 0 ) == pdPASS ) {
 
                 ESP_LOGI(TAG, "received point 1");
                 int16_t x =  signal_val & 0xFFFF;         // automatically sign-extends
                 int16_t y = (signal_val >> 16) & 0xFFFF;
                 lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
+                ESP_LOGI(TAG, "x: %d, y: %d, byte: (%x)", x, y, signal_val);
             }
             // uint32_t local_time_s  = time_since_last_sntp_update + time_diff_since_last_update;
 

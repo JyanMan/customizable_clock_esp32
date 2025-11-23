@@ -68,39 +68,16 @@ static int btn_click_chr_access(
                 goto error;
             }
             // /* Verify access buffer length */
-            // if (ctxt->om->om_len != 1) {
-            //     goto error;
-            // }
-            /* Turn the LED on or off according to the operation bit */
-            // uint8_t value = ctxt->om->om_data[0];
-            /* set the received data to global */
-            // global_data = value;
-            // gpio_set_level(2, true);
             if (ctxt->om->om_len == 4) {
                 uint8_t *data = ctxt->om->om_data;
-                uint32_t val =
-                    ((uint32_t)data[0])        |
-                    ((uint32_t)data[1] << 8)  |
-                    ((uint32_t)data[2] << 16) |
-                    ((uint32_t)data[3] << 24);
-                xQueueSend(label_positions, &val, 100 / portTICK_PERIOD_MS);
-                ESP_LOGI(TAG, "led turned on!");
+                // receive the 4 bytes (8bit each) sequence into 32bits
+                uint32_t received_data=
+                    ((uint8_t)data[0])        |
+                    ((uint8_t)data[1] << 8)  |
+                    ((uint8_t)data[2] << 16) |
+                    ((uint8_t)data[3] << 24);
+                xQueueSend(label_positions, &received_data, 100 / portTICK_PERIOD_MS);
             }
-            // switch (value) {
-            //     case 0x01:
-            //         gpio_set_level(2, true);
-            //         uint8_t val = 1;
-            //         xQueueSend(label_positions, &val, 100 / portTICK_PERIOD_MS);
-            //         ESP_LOGI(TAG, "led turned on!");
-            //         break;
-            //     case 0x10:
-            //         gpio_set_level(2, false);
-            //         ESP_LOGI(TAG, "led turned off!");
-            //         break;
-            //     default:
-            //         gpio_set_level(2, false);
-            //         break;
-            // }
             return rc;
         default:
             goto error;

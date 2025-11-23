@@ -9,6 +9,10 @@ import threading
 import queue
 
 
+MCU_CANVAS_WIDTH = 320
+MCU_CANVAS_HEIGHT = 240
+
+
 class Color(QWidget):
     def __init__(self, color):
         super().__init__()
@@ -30,7 +34,7 @@ class MouseState:
 class TimerLabel(Color):
     def __init__(self, color):
         super().__init__(color)
-        self.setFixedSize(200, 100)
+        self.setFixedSize(500, 300)
         
 
     def updateMouseDrag(self, mouse_state: MouseState, e):
@@ -103,7 +107,13 @@ class MainWindow(QMainWindow):
 
     def mouseReleaseEvent(self, e):
         if self.mouse_state.drag:
-            self.test_q.put_nowait((self.timer_label.x(), self.timer_label.y()))
+            w_ratio = MCU_CANVAS_WIDTH / self.width()
+            h_ratio = MCU_CANVAS_HEIGHT / self.height()
+
+            self.test_q.put_nowait((
+               int(round(self.timer_label.x() * w_ratio)),
+               int(round(self.timer_label.y() * h_ratio))
+            ))
 
         self.mouse_state.drag = False
             
