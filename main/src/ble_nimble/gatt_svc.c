@@ -68,7 +68,7 @@ static int clock_ui_chr_access(
             if (attr_handle != clock_ui_chr_handle) {
                 goto error;
             }
-            // /* Verify access buffer length */
+            /* Verify access buffer length */
             if (ctxt->om->om_len == 4) {
                 uint8_t *data = ctxt->om->om_data;
                 // receive the 4 bytes (8bit each) sequence into 32bits
@@ -77,7 +77,7 @@ static int clock_ui_chr_access(
                     ((uint8_t)data[1] << 8)  |
                     ((uint8_t)data[2] << 16) |
                     ((uint8_t)data[3] << 24);
-                xQueueSend(label_positions, &received_data, 100 / portTICK_PERIOD_MS);
+                xQueueSend(ui_write_queue, &received_data, 100 / portTICK_PERIOD_MS);
             }
             return rc;
         case BLE_GATT_ACCESS_OP_READ_CHR:
@@ -101,6 +101,7 @@ static int clock_ui_chr_access(
                 ESP_LOGI(TAG, "received queue as ui_data and its timer_label_pos: %x", timer_label_pos);
                 
                 rc = os_mbuf_append(ctxt->om, &timer_label_pos, sizeof(int32_t));
+                // rc = os_mbuf_append(ctxt->om, &ui_data.timer_label_width, sizeof(int32_t));
                 return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
             }
 

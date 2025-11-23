@@ -12,29 +12,67 @@
 #include "wifi_setup.h"
 
 #define ONE_HOUR_IN_SEC 3600
+#define CLOCK_STOPWATCH_TASK_PRIORITY 3
+#define CLOCK_STOPWATCH_TASK_STACK_SIZE 3 * 1024
 
 static volatile uint32_t local_time_s = 0;
-// static volatile uint32_t time_since_last_sntp_update = 0;
-// static volatile uint32_t time_diff_since_last_update = 0;
 static volatile uint16_t time_year = 0;
 static volatile uint8_t time_month = 0;
 static volatile uint8_t time_day = 0;
 
 static const char *TAG = "clock stopwatch task";
-
 static ClockStopwatchUiData ui_data;
-
+static ClockStopwatchInfo stopwatch_info;
 static SemaphoreHandle_t semaphore_stopwatch;
-QueueHandle_t label_positions;
+
+QueueHandle_t ui_write_queue;
 QueueHandle_t ui_read_queue;
+
+ClockStopwatchInfo *get_stopwatch_info() { return &stopwatch_info; }
+
+static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
+    if (stopwatch_info == NULL) {
+        ESP_LOGE(TAG, "received null stopwatch info");
+        return;
+    }
+    
+    _lock_acquire(&lvgl_api_lock);
+
+    ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
+    ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
+
+    int32_t timer_label_x = lv_obj_get_x_aligned(stopwatch_info->time_label);
+    int32_t timer_label_y = lv_obj_get_y_aligned(stopwatch_info->time_label);
+    int32_t timer_label_pos = (timer_label_x << 16) | timer_label_y;
+    ui_data.timer_label_pos = timer_label_pos;
+
+    ESP_LOGI(TAG, "x_pos: %d", timer_label_x);
+    ESP_LOGI(TAG, "y_pos: %d", timer_label_y);
+
+    _lock_release(&lvgl_api_lock);
+
+    ESP_LOGI(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
+
+    xQueueSend(ui_read_queue, &ui_data, 0);
+}
+
+void clock_stopwatch_tasks_init() {
+    ESP_LOGI(TAG, "Creating Stopwatch Update Tasks");
+    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
+
+    /* initial read */
+    send_read_queue_ui_data(&stopwatch_info);
+    xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+    xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+}
 
 void clock_stopwatch_update_time(struct tm* timeinfo) {
     local_time_s = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
     time_year = timeinfo->tm_year + 1900; // tm_year onnly returns 1900-year
     time_month = timeinfo->tm_mon;
     time_day = timeinfo->tm_mday;
-    // time_since_last_sntp_update = local_time_sec;
-    // time_diff_since_last_update = 0;
 }
 
 static bool stopwatch_increment_timer_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
@@ -77,40 +115,11 @@ static void stopwatch_increment_timer_init() {
     ESP_ERROR_CHECK(gptimer_start(gptimer));
 }
 
-static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
-    if (stopwatch_info == NULL) {
-        ESP_LOGE(TAG, "received null stopwatch info");
-        return;
-    }
-    
-    _lock_acquire(&lvgl_api_lock);
-
-    ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
-    ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
-
-    int32_t timer_label_x = lv_obj_get_x_aligned(stopwatch_info->time_label);
-    int32_t timer_label_y = lv_obj_get_y_aligned(stopwatch_info->time_label);
-    int32_t timer_label_pos = (timer_label_x << 16) | timer_label_y;
-    ui_data.timer_label_pos = timer_label_pos;
-
-    ESP_LOGI(TAG, "x_pos: %d", timer_label_x);
-    ESP_LOGI(TAG, "y_pos: %d", timer_label_y);
-
-    _lock_release(&lvgl_api_lock);
-
-    ESP_LOGI(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
-
-    xQueueSend(ui_read_queue, &ui_data, 0);
-}
-
 void clock_stopwatch_task(void *params) {
     /* init queues */
-    label_positions = xQueueCreate(10, sizeof(uint32_t));
-    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
+    ui_write_queue = xQueueCreate(10, sizeof(uint32_t));
 
-    /* initial read */
-    send_read_queue_ui_data((ClockStopwatchInfo *)params);
-
+    // task for incrementing clock per second and update clock gui
     semaphore_stopwatch = xSemaphoreCreateBinary();
     if (!semaphore_stopwatch) {
         ESP_LOGE(TAG, "insufficient heap memory for semaphore creation...");
@@ -130,7 +139,7 @@ void clock_stopwatch_task(void *params) {
         if (stopwatch_info) {
             uint32_t signal_val;
 
-            if( xQueueReceive( label_positions, &( signal_val ), 0 ) == pdPASS ) {
+            if( xQueueReceive( ui_write_queue, &( signal_val ), 0 ) == pdPASS ) {
 
                 ESP_LOGI(TAG, "received point 1");
                 int16_t x =  signal_val & 0xFFFF;         // automatically sign-extends

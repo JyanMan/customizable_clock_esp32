@@ -3,6 +3,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "wifi_setup.h"
+#include "clock_stopwatch.h"
 #include "ble_nimble/ble_nimble_setup.h"
 
 void app_main(void)
@@ -19,6 +20,7 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     
     lcd_lvgl_setup();
+    clock_stopwatch_tasks_init();
     
     ESP_ERROR_CHECK(ble_nimble_setup());
 }
