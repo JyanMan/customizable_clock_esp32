@@ -26,7 +26,7 @@ class Args(argparse.Namespace):
         self.debug = False
     
 
-async def ble_setup(args: Args, test_q: queue.Queue):
+async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
     logger = logging.getLogger(__name__)
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(
@@ -60,11 +60,28 @@ async def ble_setup(args: Args, test_q: queue.Queue):
         chr_uuid = "46F65758-1557-EF97-124E-D90845DBDAA2"
         nus = client.services.get_service(svc_uuid)
 
+        try: 
+            read_current_data = await client.read_gatt_char(chr_uuid)
+
+            print(f"curr data: {read_current_data}")
+
+            x = int.from_bytes(read_current_data[2:4], byteorder='little')
+            y = int.from_bytes(read_current_data[0:2], byteorder='little')
+
+            print(f"x: {x}, y: {y}")
+
+            read_queue.put_nowait((x, y))
+        except Exception as e:
+            print(e)
+        
+
         if nus is None:
             logger.info("no service for controller found...")
         else:
             while True:
                 await asyncio.sleep(0.05)  # prevent too fast change
+
+                
 
                 if test_q.empty():
                     continue

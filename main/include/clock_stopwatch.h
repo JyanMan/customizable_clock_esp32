@@ -25,8 +25,18 @@ typedef struct ClockStopwatchInfo {
     lv_obj_t *date_label;
 } ClockStopwatchInfo;
 
+typedef struct ClockStopwatchUiData {
+    int32_t timer_label_pos;
+    uint32_t timer_label_width;
+    uint32_t timer_label_height;
+} ClockStopwatchUiData;
+
 static _lock_t lvgl_api_lock;
+
+/* data queue for ui position changes */
 extern QueueHandle_t label_positions;
+
+extern QueueHandle_t ui_read_queue;
 
 void clock_stopwatch_info_init(ClockStopwatchInfo *csi);
 

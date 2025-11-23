@@ -231,8 +231,8 @@ void lcd_lvgl_setup() {
     xTaskCreate(lvgl_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL);
 
     ESP_LOGI(TAG, "Display LVGL Meter Widget");
-    // Lock the mutex due to the LVGL APIs are not thread-safe
 
+    // Lock the mutex due to the LVGL APIs are not thread-safe
     // create clock label
     static ClockStopwatchInfo stopwatch_info;
     _lock_acquire(&lvgl_api_lock);

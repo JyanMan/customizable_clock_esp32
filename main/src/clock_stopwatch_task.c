@@ -22,8 +22,11 @@ static volatile uint8_t time_day = 0;
 
 static const char *TAG = "clock stopwatch task";
 
+static ClockStopwatchUiData ui_data;
+
 static SemaphoreHandle_t semaphore_stopwatch;
 QueueHandle_t label_positions;
+QueueHandle_t ui_read_queue;
 
 void clock_stopwatch_update_time(struct tm* timeinfo) {
     local_time_s = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
@@ -74,8 +77,39 @@ static void stopwatch_increment_timer_init() {
     ESP_ERROR_CHECK(gptimer_start(gptimer));
 }
 
+static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
+    if (stopwatch_info == NULL) {
+        ESP_LOGE(TAG, "received null stopwatch info");
+        return;
+    }
+    
+    _lock_acquire(&lvgl_api_lock);
+
+    ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
+    ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
+
+    int32_t timer_label_x = lv_obj_get_x_aligned(stopwatch_info->time_label);
+    int32_t timer_label_y = lv_obj_get_y_aligned(stopwatch_info->time_label);
+    int32_t timer_label_pos = (timer_label_x << 16) | timer_label_y;
+    ui_data.timer_label_pos = timer_label_pos;
+
+    ESP_LOGI(TAG, "x_pos: %d", timer_label_x);
+    ESP_LOGI(TAG, "y_pos: %d", timer_label_y);
+
+    _lock_release(&lvgl_api_lock);
+
+    ESP_LOGI(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
+
+    xQueueSend(ui_read_queue, &ui_data, 0);
+}
+
 void clock_stopwatch_task(void *params) {
+    /* init queues */
     label_positions = xQueueCreate(10, sizeof(uint32_t));
+    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
+
+    /* initial read */
+    send_read_queue_ui_data((ClockStopwatchInfo *)params);
 
     semaphore_stopwatch = xSemaphoreCreateBinary();
     if (!semaphore_stopwatch) {
@@ -90,9 +124,9 @@ void clock_stopwatch_task(void *params) {
         }
         ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
 
-
-        // time_diff_since_last_update += 1;
+        // increment time
         local_time_s += 1;
+
         if (stopwatch_info) {
             uint32_t signal_val;
 
@@ -104,7 +138,6 @@ void clock_stopwatch_task(void *params) {
                 lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
                 ESP_LOGI(TAG, "x: %d, y: %d, byte: (%x)", x, y, signal_val);
             }
-            // uint32_t local_time_s  = time_since_last_sntp_update + time_diff_since_last_update;
 
             char local_time_str[16];
             char sec_str[4];
@@ -121,7 +154,6 @@ void clock_stopwatch_task(void *params) {
             lv_label_set_text(stopwatch_info->sec_label, sec_str);
             _lock_release(&lvgl_api_lock);
         }
-        // vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 

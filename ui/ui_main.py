@@ -9,16 +9,17 @@ import time
 import queue
 
 test_q = queue.Queue()
+read_queue = queue.Queue()
 
 def ble_thread():
-    asyncio.run(ble.ble_setup(ble.Args("NimBLE_GATT"), test_q))
+    asyncio.run(ble.ble_setup(ble.Args("NimBLE_GATT"), test_q, read_queue))
 
 
 def main():
 
     threads = [
         threading.Thread(target=ble_thread, daemon=True),
-        threading.Thread(target=pyqt.app_thread, args=(test_q,))
+        threading.Thread(target=pyqt.app_thread, args=(test_q, read_queue))
     ]
 
     for t in threads:

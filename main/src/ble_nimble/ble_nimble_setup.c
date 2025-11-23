@@ -5,7 +5,8 @@
 #include "ble_nimble/common.h"
 #include "ble_nimble/gap.h"
 
-#define NIMBLE_HOST_STACK_SIZE 4*1024
+#define NIMBLE_STACK_SIZE 4*1024
+#define NIMBLE_TASK_PRIORITY 5
 
 esp_err_t ble_nimble_setup() {
     nimble_host_config_init();
@@ -33,7 +34,7 @@ esp_err_t ble_nimble_setup() {
     }
 
     /* Start NimBLE host task thread and return */
-    xTaskCreate(nimble_host_task, "NIMBLE HOST TASK", NIMBLE_HOST_STACK_SIZE, NULL, 5, NULL);
+    xTaskCreate(nimble_host_task, "NIMBLE HOST TASK", NIMBLE_STACK_SIZE, NULL, NIMBLE_TASK_PRIORITY, NULL);
 
     return rc;
 }

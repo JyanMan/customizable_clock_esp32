@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QStackedLayout
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow, QVBoxLayout
 from PyQt6.QtGui import QColor, QPalette
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
@@ -71,25 +71,42 @@ class TimerLabel(Color):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, test_q):
+    def __init__(self, test_q, read_queue):
         super().__init__()
 
         self.mouse_state = MouseState
 
         self.test_q: queue.Queue = test_q
+        self.read_queue: queue.Queue = read_queue;
 
         self.timer_label = TimerLabel("red")
         
-        self.layout = QStackedLayout()
-        # layout.addWidget(Color("grey"))
+        self.sync_from_mcu_btn = QPushButton()
+        self.sync_from_mcu_btn.clicked.connect(self.sync_from_mcu)
+        self.sync_from_mcu_btn.setFixedSize(150, 70)
+        self.sync_from_mcu_btn.setText("Sync From MCU")
+        self.sync_from_mcu_btn.move(200, 0)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.sync_from_mcu_btn)
         self.layout.addWidget(self.timer_label)
-        self.layout.addWidget(Color("pink"))
 
-        self.layout.setCurrentIndex(2)
-
-        self.main_widget = QWidget()
+        self.main_widget = Color("pink")
         self.main_widget.setLayout(self.layout)
         self.setCentralWidget(self.main_widget)
+
+
+    def sync_from_mcu(self):
+        if not self.read_queue.empty():
+            new_pos: queue.Queue = self.read_queue.get_nowait()
+            x = new_pos[0]
+            y = new_pos[1]
+            w_ratio = self.width() / MCU_CANVAS_WIDTH
+            h_ratio = self.height() / MCU_CANVAS_HEIGHT
+            self.timer_label.move(
+                int(x * w_ratio),
+                int(y * h_ratio)
+            )
 
 
     def mouseMoveEvent(self, e):
@@ -118,15 +135,16 @@ class MainWindow(QMainWindow):
         self.mouse_state.drag = False
             
 
-def app_thread(test_q: queue.Queue):
+def app_thread(test_q: queue.Queue, read_queue: queue.Queue):
     app = QApplication(sys.argv)
 
     # Create a Qt widget, which will be our window.
-    window = MainWindow(test_q)
+    window = MainWindow(test_q, read_queue)
     window.show()  # IMPORTANT!!!!! Windows are hidden by default.
     app.exec()
 
 
 if __name__ == "__main__":
     q = queue.Queue()
-    app_thread(q)
+    q2 = queue.Queue()
+    app_thread(q, q2)

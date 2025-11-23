@@ -28,7 +28,7 @@ static void clock_time_label(lv_obj_t *label) {
     lv_obj_add_style(label, &label_style, LV_PART_MAIN);
     lv_label_set_text(label, "00:00");
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0x504945), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_CENTER, -50, 0);
+    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 20, 100);
 }
 
 static void clock_sec_label(lv_obj_t *label) {
