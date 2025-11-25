@@ -108,6 +108,10 @@ class MainWindow(QMainWindow):
                 int(y * h_ratio)
             )
 
+            width = int(new_pos[2] * w_ratio)
+            height = int(new_pos[3] * h_ratio)
+            self.timer_label.setFixedSize(width, height)
+
 
     def mouseMoveEvent(self, e):
         self.timer_label.updateMouseDrag(self.mouse_state, e)

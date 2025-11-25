@@ -100,8 +100,10 @@ static int clock_ui_chr_access(
                 int32_t timer_label_pos = ui_data.timer_label_pos;
                 ESP_LOGI(TAG, "received queue as ui_data and its timer_label_pos: %x", timer_label_pos);
                 
-                rc = os_mbuf_append(ctxt->om, &timer_label_pos, sizeof(int32_t));
-                // rc = os_mbuf_append(ctxt->om, &ui_data.timer_label_width, sizeof(int32_t));
+                os_mbuf_append(ctxt->om, &timer_label_pos, sizeof(int32_t));
+                os_mbuf_append(ctxt->om, &ui_data.timer_label_height, sizeof(int32_t));
+                rc = os_mbuf_append(ctxt->om, &ui_data.timer_label_width, sizeof(int32_t));
+                ESP_LOGI(TAG, "received width and height: %d, %d", ui_data.timer_label_width, ui_data.timer_label_height);
                 return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
             }
 

@@ -1,4 +1,5 @@
 ## TODO
+* fix up getting width and height as they are zero for label
 * Add fetching of weather data
 * Make more aesthetic
 * Add ways to edit the design

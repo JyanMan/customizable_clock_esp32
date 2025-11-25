@@ -67,10 +67,12 @@ async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
 
             x = int.from_bytes(read_current_data[2:4], byteorder='little')
             y = int.from_bytes(read_current_data[0:2], byteorder='little')
+            # width = int.from_bytes(read_current_data[4:8], byteorder="little")
+            # height = int.from_bytes(read_current_data[8:12], byteorder="little")
 
-            print(f"x: {x}, y: {y}")
+            # print(f"x: {x}, y: {y}, w: {width}, h: {height}")
 
-            read_queue.put_nowait((x, y))
+            read_queue.put_nowait((x, y, 170, 80))
         except Exception as e:
             print(e)
         

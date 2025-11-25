@@ -5,6 +5,8 @@
 #include "freertos/task.h"
 #include "clock_stopwatch.h"
 #include "sntp_setup.h"
+#include "esp_event.h"
+#include "esp_netif.h"
 #include "lvgl.h"
 #include "esp_log.h"
 #include "esp_timer.h"
@@ -25,11 +27,34 @@ static ClockStopwatchUiData ui_data;
 static ClockStopwatchInfo stopwatch_info;
 static SemaphoreHandle_t semaphore_stopwatch;
 
+static void clock_stopwatch_sync_sntp_task(void *params);
+static void clock_stopwatch_task(void *params);
+static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info);
+static void init_tasks();
+static void stopwatch_increment_timer_init();
+static void init_queues_and_semaphores();
+
 QueueHandle_t ui_write_queue;
 QueueHandle_t ui_read_queue;
 
+/* PUBLIC FUNCTIONS */
 ClockStopwatchInfo *get_stopwatch_info() { return &stopwatch_info; }
 
+void clock_stopwatch_init() {
+    init_queues_and_semaphores();
+    stopwatch_increment_timer_init();
+    init_tasks();
+    send_read_queue_ui_data(&stopwatch_info);
+}
+
+void clock_stopwatch_update_time(struct tm* timeinfo) {
+    local_time_s = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
+    time_year = timeinfo->tm_year + 1900; // tm_year onnly returns 1900-year
+    time_month = timeinfo->tm_mon;
+    time_day = timeinfo->tm_mday;
+}
+
+/* PRIVATE FUNCTIONS */
 static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     if (stopwatch_info == NULL) {
         ESP_LOGE(TAG, "received null stopwatch info");
@@ -48,6 +73,8 @@ static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
 
     ESP_LOGI(TAG, "x_pos: %d", timer_label_x);
     ESP_LOGI(TAG, "y_pos: %d", timer_label_y);
+    ESP_LOGI(TAG, "width: %d", ui_data.timer_label_width);
+    ESP_LOGI(TAG, "height: %d", ui_data.timer_label_height);
 
     _lock_release(&lvgl_api_lock);
 
@@ -56,27 +83,7 @@ static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     xQueueSend(ui_read_queue, &ui_data, 0);
 }
 
-void clock_stopwatch_tasks_init() {
-    ESP_LOGI(TAG, "Creating Stopwatch Update Tasks");
-    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
-
-    /* initial read */
-    send_read_queue_ui_data(&stopwatch_info);
-    xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
-    xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
-}
-
-void clock_stopwatch_update_time(struct tm* timeinfo) {
-    local_time_s = timeinfo->tm_hour * 3600 + (timeinfo->tm_min * 60) + (timeinfo->tm_sec); 
-    time_year = timeinfo->tm_year + 1900; // tm_year onnly returns 1900-year
-    time_month = timeinfo->tm_mon;
-    time_day = timeinfo->tm_mday;
-}
-
-static bool stopwatch_increment_timer_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
-{
+static bool stopwatch_increment_timer_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx) {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     xSemaphoreGiveFromISR(semaphore_stopwatch, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken) {
@@ -115,18 +122,27 @@ static void stopwatch_increment_timer_init() {
     ESP_ERROR_CHECK(gptimer_start(gptimer));
 }
 
-void clock_stopwatch_task(void *params) {
-    /* init queues */
+static void init_queues_and_semaphores() {
+    ESP_LOGI(TAG, "create queues");
+    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
     ui_write_queue = xQueueCreate(10, sizeof(uint32_t));
 
-    // task for incrementing clock per second and update clock gui
+    ESP_LOGI(TAG, "creating timer incrementor");
     semaphore_stopwatch = xSemaphoreCreateBinary();
     if (!semaphore_stopwatch) {
         ESP_LOGE(TAG, "insufficient heap memory for semaphore creation...");
     }
+}
 
-    stopwatch_increment_timer_init();
+static void init_tasks() {
+    ESP_LOGI(TAG, "Creating Stopwatch Update Tasks");
+    xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+    xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+}
 
+static void clock_stopwatch_task(void *params) {
     for ( ;; ) {
         if ( xSemaphoreTake( semaphore_stopwatch, portMAX_DELAY) == pdFALSE ) {
             continue;
@@ -200,7 +216,7 @@ static void update_date_label(ClockStopwatchInfo *stopwatch_info) {
     _lock_release(&lvgl_api_lock);
 }
 
-void clock_stopwatch_sync_sntp_task(void *params) {
+static void clock_stopwatch_sync_sntp_task(void *params) {
 
     static volatile uint8_t sync_retries = 0;
     static const uint8_t retry_sec = 5;
@@ -231,7 +247,6 @@ void clock_stopwatch_sync_sntp_task(void *params) {
             }
         }
 
-        // uint8_t hours_since_update = time_diff_since_last_update / ONE_HOUR_IN_SEC;
         uint8_t local_hours = local_time_s / ONE_HOUR_IN_SEC;
         if (local_hours == 0 || local_hours == 1) {
             if (sntp_sync() == ESP_ERR_TIMEOUT) {

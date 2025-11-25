@@ -239,11 +239,4 @@ void lcd_lvgl_setup() {
     clock_stopwatch_info_init(stopwatch_info);
     clock_countdown_lvgl_ui(display, stopwatch_info);
     _lock_release(&lvgl_api_lock);
-
-    // task for incrementing clock per second and update clock gui
-    // ESP_LOGI(TAG, "Create Stopwatch Update Task");
-    // xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-    //     &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
-    // xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
-    //     &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
 }
