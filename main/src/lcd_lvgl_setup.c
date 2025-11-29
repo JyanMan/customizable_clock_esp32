@@ -26,6 +26,8 @@
 
 static const char *TAG = "lcd lvgl setup";
 
+static _lock_t lvgl_api_lock;
+
 #define LCD_HOST  SPI2_HOST
 
 #define LCD_PIXEL_CLOCK_HZ     (20 * 1000 * 1000)
@@ -56,6 +58,10 @@ static const char *TAG = "lcd lvgl setup";
 
 #define CLOCK_STOPWATCH_TASK_PRIORITY 3
 #define CLOCK_STOPWATCH_TASK_STACK_SIZE 3 * 1024
+
+static lv_display_t *main_display;
+
+lv_display_t *lvgl_get_display() { return main_display; }
 
 // LVGL library is not thread-safe, this example will call LVGL APIs from different tasks, so use a mutex to protect it
 // static _lock_t lvgl_api_lock;
@@ -190,8 +196,8 @@ void lcd_lvgl_setup() {
     lv_init();
 
     // create a lvgl display
-    lv_display_t *display = lv_display_create(LCD_H_RES, LCD_V_RES);
-    lv_display_set_rotation(display, LV_DISPLAY_ROTATION_90);
+    main_display  = lv_display_create(LCD_H_RES, LCD_V_RES);
+    lv_display_set_rotation(main_display, LV_DISPLAY_ROTATION_90);
 
     // alloc draw buffers used by LVGL
     // it's recommended to choose the size of the draw buffer(s) to be at least 1/10 screen sized
@@ -202,13 +208,13 @@ void lcd_lvgl_setup() {
     void *buf2 = spi_bus_dma_memory_alloc(LCD_HOST, draw_buffer_sz, 0);
     assert(buf2);
     // initialize LVGL draw buffers
-    lv_display_set_buffers(display, buf1, buf2, draw_buffer_sz, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(main_display, buf1, buf2, draw_buffer_sz, LV_DISPLAY_RENDER_MODE_PARTIAL);
     // associate the mipi panel handle to the display
-    lv_display_set_user_data(display, panel_handle);
+    lv_display_set_user_data(main_display, panel_handle);
     // set color depth
-    lv_display_set_color_format(display, LV_COLOR_FORMAT_RGB565);
+    lv_display_set_color_format(main_display, LV_COLOR_FORMAT_RGB565);
     // set the callback which can copy the rendered image to an area of the display
-    lv_display_set_flush_cb(display, lvgl_flush_cb);
+    lv_display_set_flush_cb(main_display, lvgl_flush_cb);
 
     ESP_LOGI(TAG, "Install LVGL tick timer");
     // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
@@ -225,18 +231,11 @@ void lcd_lvgl_setup() {
         .on_color_trans_done = notify_lvgl_flush_ready,
     };
     /* Register done callback */
-    ESP_ERROR_CHECK(esp_lcd_panel_io_register_event_callbacks(io_handle, &cbs, display));
+    ESP_ERROR_CHECK(esp_lcd_panel_io_register_event_callbacks(io_handle, &cbs, main_display));
 
     ESP_LOGI(TAG, "Create LVGL task");
     xTaskCreate(lvgl_port_task, "LVGL", LVGL_TASK_STACK_SIZE, NULL, LVGL_TASK_PRIORITY, NULL);
 
     ESP_LOGI(TAG, "Display LVGL Meter Widget");
 
-    // Lock the mutex due to the LVGL APIs are not thread-safe
-    // create clock label
-    ClockStopwatchInfo *stopwatch_info = get_stopwatch_info();
-    _lock_acquire(&lvgl_api_lock);
-    clock_stopwatch_info_init(stopwatch_info);
-    clock_countdown_lvgl_ui(display, stopwatch_info);
-    _lock_release(&lvgl_api_lock);
 }

@@ -12,6 +12,7 @@
 #include "esp_timer.h"
 #include "driver/gptimer.h"
 #include "wifi_setup.h"
+#include "lcd_lvgl_setup.h"
 
 #define ONE_HOUR_IN_SEC 3600
 #define CLOCK_STOPWATCH_TASK_PRIORITY 3
@@ -22,11 +23,14 @@ static volatile uint16_t time_year = 0;
 static volatile uint8_t time_month = 0;
 static volatile uint8_t time_day = 0;
 
+static _lock_t lvgl_api_lock;
+
 static const char *TAG = "clock stopwatch task";
 static ClockStopwatchUiData ui_data;
 static ClockStopwatchInfo stopwatch_info;
 static SemaphoreHandle_t semaphore_stopwatch;
 
+static void init_lvgl_ui();
 static void clock_stopwatch_sync_sntp_task(void *params);
 static void clock_stopwatch_task(void *params);
 static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info);
@@ -34,6 +38,7 @@ static void init_tasks();
 static void stopwatch_increment_timer_init();
 static void init_queues_and_semaphores();
 
+/* public variables */
 QueueHandle_t ui_write_queue;
 QueueHandle_t ui_read_queue;
 
@@ -41,6 +46,7 @@ QueueHandle_t ui_read_queue;
 ClockStopwatchInfo *get_stopwatch_info() { return &stopwatch_info; }
 
 void clock_stopwatch_init() {
+    init_lvgl_ui();
     init_queues_and_semaphores();
     stopwatch_increment_timer_init();
     init_tasks();
@@ -55,6 +61,19 @@ void clock_stopwatch_update_time(struct tm* timeinfo) {
 }
 
 /* PRIVATE FUNCTIONS */
+static void init_lvgl_ui() {
+    // REQUIRED: lvgl has been setup
+    // Lock the mutex due to the LVGL APIs are not thread-safe
+    // create clock label
+    ClockStopwatchInfo *stopwatch_info = get_stopwatch_info();
+    lv_display_t *display = lvgl_get_display();
+
+    _lock_acquire(&lvgl_api_lock);
+    clock_stopwatch_info_init(stopwatch_info);
+    clock_countdown_lvgl_ui(display, stopwatch_info);
+    _lock_release(&lvgl_api_lock);
+}
+
 static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     if (stopwatch_info == NULL) {
         ESP_LOGE(TAG, "received null stopwatch info");

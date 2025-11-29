@@ -20,7 +20,7 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     
     lcd_lvgl_setup();
-    clock_stopwatch_tasks_init();
+    clock_stopwatch_init();
     
     ESP_ERROR_CHECK(ble_nimble_setup());
 }

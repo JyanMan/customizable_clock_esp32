@@ -31,17 +31,13 @@ typedef struct ClockStopwatchUiData {
     uint32_t timer_label_height;
 } ClockStopwatchUiData;
 
-static _lock_t lvgl_api_lock;
-
-
-
 /* data queue for ui position changes */
 extern QueueHandle_t ui_write_queue;
 
 extern QueueHandle_t ui_read_queue;
 
 ClockStopwatchInfo *get_stopwatch_info();
-void clock_stopwatch_tasks_init();
+void clock_stopwatch_init();
 void clock_stopwatch_info_init(ClockStopwatchInfo *csi);
 void clock_countdown_lvgl_ui(lv_display_t *disp, ClockStopwatchInfo *stopwatch_info);
 void clock_stopwatch_update_time(struct tm* timeinfo);
