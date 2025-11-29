@@ -12,6 +12,8 @@
 #include "freertos/task.h"
 #include "clock_stopwatch.h"
 
+#define READ_NUM_BYTES 4
+
 /* Private function declarations */
 static int clock_ui_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                           struct ble_gatt_access_ctxt *ctxt, void *arg);
@@ -69,16 +71,15 @@ static int clock_ui_chr_access(
                 goto error;
             }
             /* Verify access buffer length */
-            if (ctxt->om->om_len == 4) {
-                uint8_t *data = ctxt->om->om_data;
-                // receive the 4 bytes (8bit each) sequence into 32bits
-                uint32_t received_data=
-                    ((uint8_t)data[0])        |
-                    ((uint8_t)data[1] << 8)  |
-                    ((uint8_t)data[2] << 16) |
-                    ((uint8_t)data[3] << 24);
-                xQueueSend(ui_write_queue, &received_data, 100 / portTICK_PERIOD_MS);
+            if (ctxt->om->om_len != READ_NUM_BYTES) {
+                return rc;
             }
+            uint8_t *data = ctxt->om->om_data;
+            WriteData write_data;
+            write_data.timer_label_x = data[0] | (data[1] << 8);
+            write_data.timer_label_y = data[2] | (data[3] << 8);
+            xQueueSend(ui_write_queue, &write_data, 100 / portTICK_PERIOD_MS);
+
             return rc;
         case BLE_GATT_ACCESS_OP_READ_CHR:
             if (conn_handle != BLE_HS_CONN_HANDLE_NONE) {

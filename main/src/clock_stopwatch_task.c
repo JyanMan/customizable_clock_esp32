@@ -144,7 +144,7 @@ static void stopwatch_increment_timer_init() {
 static void init_queues_and_semaphores() {
     ESP_LOGI(TAG, "create queues");
     ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
-    ui_write_queue = xQueueCreate(10, sizeof(uint32_t));
+    ui_write_queue = xQueueCreate(10, sizeof(WriteData));
 
     ESP_LOGI(TAG, "creating timer incrementor");
     semaphore_stopwatch = xSemaphoreCreateBinary();
@@ -161,6 +161,7 @@ static void init_tasks() {
         &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
 }
 
+/* for optimizations, separate the incrementation and this whole thing */
 static void clock_stopwatch_task(void *params) {
     for ( ;; ) {
         if ( xSemaphoreTake( semaphore_stopwatch, portMAX_DELAY) == pdFALSE ) {
@@ -172,15 +173,20 @@ static void clock_stopwatch_task(void *params) {
         local_time_s += 1;
 
         if (stopwatch_info) {
-            uint32_t signal_val;
+            // uint32_t signal_val;
+            WriteData write_data;
 
-            if( xQueueReceive( ui_write_queue, &( signal_val ), 0 ) == pdPASS ) {
+            if( xQueueReceive( ui_write_queue, &( write_data), 0 ) == pdPASS ) {
 
                 ESP_LOGI(TAG, "received point 1");
-                int16_t x =  signal_val & 0xFFFF;         // automatically sign-extends
-                int16_t y = (signal_val >> 16) & 0xFFFF;
+                int16_t x = write_data.timer_label_x;
+                int16_t y = write_data.timer_label_y;
+
+                _lock_acquire(&lvgl_api_lock);
                 lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
-                ESP_LOGI(TAG, "x: %d, y: %d, byte: (%x)", x, y, signal_val);
+                _lock_release(&lvgl_api_lock);
+
+                ESP_LOGI(TAG, "x: %d, y: %d", x, y);
             }
 
             char local_time_str[16];
@@ -240,6 +246,8 @@ static void clock_stopwatch_sync_sntp_task(void *params) {
     static volatile uint8_t sync_retries = 0;
     static const uint8_t retry_sec = 5;
 
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(wifi_full_init());
 
     // sync on boot

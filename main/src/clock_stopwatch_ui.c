@@ -9,6 +9,9 @@
 #include "lvgl.h"
 #include "clock_stopwatch.h"
 
+#define TIME_LABEL_HEIGHT LV_SIZE_CONTENT
+#define TIME_LABEL_WIDTH LV_SIZE_CONTENT
+
 static void clock_time_label(lv_obj_t *label) {
     static lv_style_t label_style;
     lv_style_init(&label_style);
@@ -24,11 +27,13 @@ static void clock_time_label(lv_obj_t *label) {
     lv_style_set_text_line_space(&label_style, 20);
     lv_style_set_text_decor(&label_style, LV_TEXT_DECOR_UNDERLINE);
     lv_style_set_text_font(&label_style, &lv_font_montserrat_48);
-
+    
     lv_obj_add_style(label, &label_style, LV_PART_MAIN);
     lv_label_set_text(label, "00:00");
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(0x504945), LV_PART_MAIN);
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 20, 100);
+
+    lv_obj_set_size(label, TIME_LABEL_WIDTH, TIME_LABEL_HEIGHT);
 }
 
 static void clock_sec_label(lv_obj_t *label) {

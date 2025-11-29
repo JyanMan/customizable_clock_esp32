@@ -27,9 +27,15 @@ typedef struct ClockStopwatchInfo {
 
 typedef struct ClockStopwatchUiData {
     int32_t timer_label_pos;
-    uint32_t timer_label_width;
-    uint32_t timer_label_height;
+    int32_t timer_label_width;
+    int32_t timer_label_height;
 } ClockStopwatchUiData;
+
+typedef struct WriteData {
+    int16_t timer_label_x;
+    int16_t timer_label_y;
+    int8_t requested_ui_data;
+} WriteData;
 
 /* data queue for ui position changes */
 extern QueueHandle_t ui_write_queue;
