@@ -173,7 +173,6 @@ static void clock_stopwatch_task(void *params) {
         local_time_s += 1;
 
         if (stopwatch_info) {
-            // uint32_t signal_val;
             WriteData write_data;
 
             if( xQueueReceive( ui_write_queue, &( write_data), 0 ) == pdPASS ) {

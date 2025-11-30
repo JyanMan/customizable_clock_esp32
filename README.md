@@ -1,5 +1,8 @@
 ## TODO
 * fix up getting width and height as they are zero for label
+   - use Qthreads in pyqt
+* fix up the fact that you cannot reconnect the ui editor
+   - the hecking ble cannot detect for disconnection when the software is forced to quit
 * Add fetching of weather data
 * Make more aesthetic
 * Add ways to edit the design

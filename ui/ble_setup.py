@@ -5,6 +5,8 @@ import queue
 
 from typing import Optional
 
+from pyqt_thread import WriteData
+
 from bleak import BleakScanner, BleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
@@ -83,19 +85,17 @@ async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
             while True:
                 await asyncio.sleep(0.05)  # prevent too fast change
 
-                
-
                 if test_q.empty():
                     continue
 
-                result = test_q.get_nowait();  
+                result: WriteData = test_q.get_nowait();  
                 if result:
                     print("received")
                 test_q.task_done()
 
                 # data_to_send: int =  result.x() | (result.y() << 16)
-                x16 = result[0] & 0xFFFF
-                y16 = result[1] & 0xFFFF
+                x16 = result.timer_x & 0xFFFF
+                y16 = result.timer_y & 0xFFFF
 
                 data_to_send = x16 | (y16 << 16)
                 data_bytes = data_to_send.to_bytes(4, byteorder="little", signed=False)

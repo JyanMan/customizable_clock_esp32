@@ -34,7 +34,6 @@ typedef struct ClockStopwatchUiData {
 typedef struct WriteData {
     int16_t timer_label_x;
     int16_t timer_label_y;
-    int8_t requested_ui_data;
 } WriteData;
 
 /* data queue for ui position changes */

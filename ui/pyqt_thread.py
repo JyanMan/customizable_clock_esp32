@@ -13,6 +13,12 @@ MCU_CANVAS_WIDTH = 320
 MCU_CANVAS_HEIGHT = 240
 
 
+class WriteData:
+    def __init__(self, timer_x: int, timer_y: int):
+        self.timer_x = timer_x
+        self.timer_y = timer_y
+
+
 class Color(QWidget):
     def __init__(self, color):
         super().__init__()
@@ -97,6 +103,7 @@ class MainWindow(QMainWindow):
 
 
     def sync_from_mcu(self):
+        # self.test_q.put_nowait()
         if not self.read_queue.empty():
             new_pos: queue.Queue = self.read_queue.get_nowait()
             x = new_pos[0]
@@ -131,9 +138,9 @@ class MainWindow(QMainWindow):
             w_ratio = MCU_CANVAS_WIDTH / self.width()
             h_ratio = MCU_CANVAS_HEIGHT / self.height()
 
-            self.test_q.put_nowait((
+            self.test_q.put_nowait(WriteData(
                int(round(self.timer_label.x() * w_ratio)),
-               int(round(self.timer_label.y() * h_ratio))
+               int(round(self.timer_label.y() * h_ratio)),
             ))
 
         self.mouse_state.drag = False
