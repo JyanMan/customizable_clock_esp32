@@ -3,14 +3,61 @@ from PyQt6.QtGui import QColor, QPalette
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt
 
+from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtCore import QRunnable, Qt, QThreadPool
+from enum import Enum
 
+import asyncio
 import sys
 import threading
 import queue
+import ble_setup as ble
 
 
 MCU_CANVAS_WIDTH = 320
 MCU_CANVAS_HEIGHT = 240
+
+
+class QueueRead[Enum]:
+    Transform = 0x01
+
+
+class QueueWorker(QRunnable):
+    def __init__(self, write_queue, read_queue):
+        super().__init__()        
+        self.write_queue = write_queue
+        self.read_queue = read_queue
+
+
+    def read_queues(self):
+        if not self.read_queue.empty():
+            data: bytes = self.read_queue.get_nowait()
+            data_type = data[0]
+            print(f"data_type: {data_type}")
+            match data_type:
+                case QueueRead.Transform:
+                    print("received current transform from mcu")
+                    # send data to window
+                case _:
+                    print(f"unknown received data type {data_type}")
+
+
+    def run(self):
+        while True:
+            self.read_queues()
+            
+
+
+class BleWorker(QRunnable):
+    def __init__(self, test_q, read_queue):
+        super().__init__()
+        self.test_q: queue.Queue = test_q
+        self.read_queue: queue.Queue = read_queue
+
+
+    def run(self):
+        asyncio.run(ble.ble_setup(ble.Args("NimBLE_GATT"), self.test_q, self.read_queue))
 
 
 class WriteData:
@@ -101,23 +148,46 @@ class MainWindow(QMainWindow):
         self.main_widget.setLayout(self.layout)
         self.setCentralWidget(self.main_widget)
 
+        self.init_workers()
+
+
+    def init_workers(self):
+
+        pool = QThreadPool.globalInstance()
+        self.ble_worker = BleWorker(self.test_q, self.read_queue)
+        self.queue_worker = QueueWorker(self.test_q, self.read_queue)
+        pool.start(self.ble_worker)
+        pool.start(self.queue_worker)
+        # self.thread = QThread()
+
+        # self.ble_worker = BleWorker(self.test_q, self.read_queue)
+        # self.ble_worker.moveToThread(self.thread)
+
+        # self.queue_worker = QueueWorker(self.test_q, self.read_queue)
+        # self.queue_worker.moveToThread(self.thread)
+
+        # self.thread.started.connect(self.ble_worker.run)
+        # self.thread.started.connect(self.queue_worker.run)
+        # self.thread.start()
+
 
     def sync_from_mcu(self):
+        pass
         # self.test_q.put_nowait()
-        if not self.read_queue.empty():
-            new_pos: queue.Queue = self.read_queue.get_nowait()
-            x = new_pos[0]
-            y = new_pos[1]
-            w_ratio = self.width() / MCU_CANVAS_WIDTH
-            h_ratio = self.height() / MCU_CANVAS_HEIGHT
-            self.timer_label.move(
-                int(x * w_ratio),
-                int(y * h_ratio)
-            )
+        # if not self.read_queue.empty():
+        #     new_pos: queue.Queue = self.read_queue.get_nowait()
+        #     x = new_pos[0]
+        #     y = new_pos[1]
+        #     w_ratio = self.width() / MCU_CANVAS_WIDTH
+        #     h_ratio = self.height() / MCU_CANVAS_HEIGHT
+        #     self.timer_label.move(
+        #         int(x * w_ratio),
+        #         int(y * h_ratio)
+        #     )
 
-            width = int(new_pos[2] * w_ratio)
-            height = int(new_pos[3] * h_ratio)
-            self.timer_label.setFixedSize(width, height)
+        #     width = int(new_pos[2] * w_ratio)
+        #     height = int(new_pos[3] * h_ratio)
+        #     self.timer_label.setFixedSize(width, height)
 
 
     def mouseMoveEvent(self, e):
@@ -147,6 +217,7 @@ class MainWindow(QMainWindow):
             
 
 def app_thread(test_q: queue.Queue, read_queue: queue.Queue):
+    
     app = QApplication(sys.argv)
 
     # Create a Qt widget, which will be our window.

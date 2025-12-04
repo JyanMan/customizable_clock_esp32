@@ -76,8 +76,10 @@ static int clock_ui_chr_access(
             }
             uint8_t *data = ctxt->om->om_data;
             WriteData write_data;
+            /* receive data */
             write_data.timer_label_x = data[0] | (data[1] << 8);
             write_data.timer_label_y = data[2] | (data[3] << 8);
+            /* put to queue to be read from the tasks */
             xQueueSend(ui_write_queue, &write_data, 100 / portTICK_PERIOD_MS);
 
             return rc;
@@ -101,6 +103,10 @@ static int clock_ui_chr_access(
                 int32_t timer_label_pos = ui_data.timer_label_pos;
                 ESP_LOGI(TAG, "received queue as ui_data and its timer_label_pos: %x", timer_label_pos);
                 
+                /* send data via ble */
+                uint8_t test = 0x01;
+                
+                os_mbuf_append(ctxt->om, &test, sizeof(uint8_t));
                 os_mbuf_append(ctxt->om, &timer_label_pos, sizeof(int32_t));
                 os_mbuf_append(ctxt->om, &ui_data.timer_label_height, sizeof(int32_t));
                 rc = os_mbuf_append(ctxt->om, &ui_data.timer_label_width, sizeof(int32_t));

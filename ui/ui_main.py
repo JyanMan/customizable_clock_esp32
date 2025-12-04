@@ -1,4 +1,3 @@
-from PyQt6.QtWidgets import QApplication, QWidget
 
 import sys
 import ble_setup as ble
@@ -17,17 +16,19 @@ def ble_thread():
 
 def main():
 
-    threads = [
-        threading.Thread(target=ble_thread, daemon=True),
-        threading.Thread(target=pyqt.app_thread, args=(test_q, read_queue))
-    ]
+    pyqt.app_thread(test_q, read_queue)
 
-    for t in threads:
-        t.start()
+    # threads = [
+    #     threading.Thread(target=ble_thread, daemon=True),
+    #     threading.Thread(target=pyqt.app_thread, args=(test_q, read_queue))
+    # ]
+
+    # for t in threads:
+    #     t.start()
 
 
-    for t in threads:
-        t.join()
+    # for t in threads:
+    #     t.join()
 
 
 if __name__ == "__main__":

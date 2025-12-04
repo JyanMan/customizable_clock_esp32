@@ -12,13 +12,9 @@ from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 
 
+
+
 class Args(argparse.Namespace):
-    # name: Optional[str]
-    # address: Optional[str]
-    # macos_use_bdaddr: bool
-    # services: list[str]
-    # pair: bool
-    # debug: bool
 
     def __init__(self, name: str, services: list[str] = None):
         self.name = name
@@ -65,16 +61,17 @@ async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
         try: 
             read_current_data = await client.read_gatt_char(chr_uuid)
 
-            print(f"curr data: {read_current_data}")
+            print(f"received from mcu data: {read_current_data}")
 
-            x = int.from_bytes(read_current_data[2:4], byteorder='little')
-            y = int.from_bytes(read_current_data[0:2], byteorder='little')
+            # x = int.from_bytes(read_current_data[2:4], byteorder='little')
+            # y = int.from_bytes(read_current_data[0:2], byteorder='little')
             # width = int.from_bytes(read_current_data[4:8], byteorder="little")
             # height = int.from_bytes(read_current_data[8:12], byteorder="little")
 
             # print(f"x: {x}, y: {y}, w: {width}, h: {height}")
 
-            read_queue.put_nowait((x, y, 170, 80))
+            # read_queue.put_nowait((x, y, 170, 80))
+            read_queue.put_nowait(read_current_data)
         except Exception as e:
             print(e)
         
@@ -100,7 +97,7 @@ async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
                 data_to_send = x16 | (y16 << 16)
                 data_bytes = data_to_send.to_bytes(4, byteorder="little", signed=False)
 
-                print(f"sent bytes -> x: {x16}, y: {y16}, combined: {data_bytes}")
+                print(f"sent to mcu in bytes -> x: {x16}, y: {y16}, combined: {data_bytes}")
 
                 await client.write_gatt_char(chr_uuid, data_bytes, response=False)
 

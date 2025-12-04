@@ -52,10 +52,3 @@ void nimble_host_task(void *param) {
     /* Clean up at exit */
     vTaskDelete(NULL);
 }
-
-void led_init_test(void) {
-    ESP_LOGI(TAG, "example configured to blink gpio led!");
-    gpio_reset_pin(BLINK_LED);
-    /* Set the GPIO as a push/pull output */
-    gpio_set_direction(BLINK_LED, GPIO_MODE_OUTPUT);
-}
