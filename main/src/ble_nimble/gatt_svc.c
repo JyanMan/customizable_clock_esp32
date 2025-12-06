@@ -12,7 +12,7 @@
 #include "freertos/task.h"
 #include "clock_stopwatch.h"
 
-#define READ_NUM_BYTES 4
+#define READ_NUM_BYTES 5
 
 /* Private function declarations */
 static int clock_ui_chr_access(uint16_t conn_handle, uint16_t attr_handle,
@@ -72,14 +72,27 @@ static int clock_ui_chr_access(
             }
             /* Verify access buffer length */
             if (ctxt->om->om_len != READ_NUM_BYTES) {
+                ESP_LOGI(TAG, "received data is not the right amount of bytes");
                 return rc;
             }
             uint8_t *data = ctxt->om->om_data;
+            uint8_t data_type = data[0]; 
             WriteData write_data;
-            /* receive data */
-            write_data.timer_label_x = data[0] | (data[1] << 8);
-            write_data.timer_label_y = data[2] | (data[3] << 8);
-            /* put to queue to be read from the tasks */
+            switch (data_type) {
+                case 0x00:
+                    write_data.data_type = WRITE_DATA_REQUESTDATA;
+                    write_data.value.request_data = true;
+                    ESP_LOGI(TAG, "data received is of type REQUESTDATA");
+                    break;
+                case 0x01:
+                    /* receive data */
+                    write_data.data_type = WRITE_DATA_POSITION;
+                    write_data.value.pos.x= data[1] | (data[2] << 8);
+                    write_data.value.pos.y = data[3] | (data[4] << 8);
+                    /* put to queue to be read from the tasks */
+                    break;
+            }
+
             xQueueSend(ui_write_queue, &write_data, 100 / portTICK_PERIOD_MS);
 
             return rc;

@@ -177,15 +177,24 @@ static void clock_stopwatch_task(void *params) {
 
             if( xQueueReceive( ui_write_queue, &( write_data), 0 ) == pdPASS ) {
 
-                ESP_LOGI(TAG, "received point 1");
-                int16_t x = write_data.timer_label_x;
-                int16_t y = write_data.timer_label_y;
+                switch (write_data.data_type) {
+                    case WRITE_DATA_POSITION:
+                        ESP_LOGI(TAG, "received point 1");
+                        int16_t x = write_data.value.pos.x;
+                        int16_t y = write_data.value.pos.y;
 
-                _lock_acquire(&lvgl_api_lock);
-                lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
-                _lock_release(&lvgl_api_lock);
+                        _lock_acquire(&lvgl_api_lock);
+                        lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
+                        _lock_release(&lvgl_api_lock);
 
-                ESP_LOGI(TAG, "x: %d, y: %d", x, y);
+                        ESP_LOGI(TAG, "x: %d, y: %d", x, y);
+                        break;
+                    case WRITE_DATA_REQUESTDATA:
+                        send_read_queue_ui_data(stopwatch_info);
+                        ESP_LOGI(TAG, "requested data");
+                        break;
+                }
+
             }
 
             char local_time_str[16];

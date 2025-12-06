@@ -31,9 +31,25 @@ typedef struct ClockStopwatchUiData {
     int32_t timer_label_height;
 } ClockStopwatchUiData;
 
+typedef struct Position {
+    int16_t x, y;
+} Position;
+
+union WriteDataValue {
+    Position pos;
+    bool request_data;
+};
+
+enum WriteDataType {
+    WRITE_DATA_POSITION,
+    WRITE_DATA_REQUESTDATA      
+};
+
 typedef struct WriteData {
-    int16_t timer_label_x;
-    int16_t timer_label_y;
+    union WriteDataValue value;
+    enum WriteDataType data_type;
+    // int16_t timer_label_x;
+    // int16_t timer_label_y;
 } WriteData;
 
 /* data queue for ui position changes */
