@@ -117,9 +117,9 @@ static int clock_ui_chr_access(
                 ESP_LOGI(TAG, "received queue as ui_data and its timer_label_pos: %x", timer_label_pos);
                 
                 /* send data via ble */
-                uint8_t test = 0x01;
+                uint8_t data_header = 0x01;
                 
-                os_mbuf_append(ctxt->om, &test, sizeof(uint8_t));
+                os_mbuf_append(ctxt->om, &data_header, sizeof(uint8_t));
                 os_mbuf_append(ctxt->om, &timer_label_pos, sizeof(int32_t));
                 os_mbuf_append(ctxt->om, &ui_data.timer_label_height, sizeof(int32_t));
                 rc = os_mbuf_append(ctxt->om, &ui_data.timer_label_width, sizeof(int32_t));

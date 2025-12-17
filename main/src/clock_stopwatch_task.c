@@ -82,9 +82,6 @@ static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     
     _lock_acquire(&lvgl_api_lock);
 
-    ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
-    ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
-
     int32_t timer_label_x = lv_obj_get_x_aligned(stopwatch_info->time_label);
     int32_t timer_label_y = lv_obj_get_y_aligned(stopwatch_info->time_label);
     int32_t timer_label_pos = (timer_label_x << 16) | timer_label_y;
@@ -95,9 +92,13 @@ static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     ESP_LOGI(TAG, "width: %d", ui_data.timer_label_width);
     ESP_LOGI(TAG, "height: %d", ui_data.timer_label_height);
 
+    ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
+    ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
+
     _lock_release(&lvgl_api_lock);
 
     ESP_LOGI(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
+    ESP_LOGI(TAG, "send data width: %d, height: %d", ui_data.timer_label_width, ui_data.timer_label_height);
 
     xQueueSend(ui_read_queue, &ui_data, 0);
 }
@@ -143,7 +144,7 @@ static void stopwatch_increment_timer_init() {
 
 static void init_queues_and_semaphores() {
     ESP_LOGI(TAG, "create queues");
-    ui_read_queue = xQueueCreate(1, sizeof(uint32_t));
+    ui_read_queue = xQueueCreate(1, sizeof(ClockStopwatchUiData));
     ui_write_queue = xQueueCreate(10, sizeof(WriteData));
 
     ESP_LOGI(TAG, "creating timer incrementor");

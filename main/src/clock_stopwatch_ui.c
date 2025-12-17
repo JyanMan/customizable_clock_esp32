@@ -8,9 +8,12 @@
 
 #include "lvgl.h"
 #include "clock_stopwatch.h"
+#include "esp_log.h"
 
 #define TIME_LABEL_HEIGHT LV_SIZE_CONTENT
 #define TIME_LABEL_WIDTH LV_SIZE_CONTENT
+
+#define TAG "ui development"
 
 static void clock_time_label(lv_obj_t *label) {
     static lv_style_t label_style;
@@ -34,6 +37,13 @@ static void clock_time_label(lv_obj_t *label) {
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 20, 100);
 
     lv_obj_set_size(label, TIME_LABEL_WIDTH, TIME_LABEL_HEIGHT);
+
+    /* apply changes -- otherwise pos w and h will be null */
+    lv_obj_update_layout(label);
+
+    int w = lv_obj_get_width(label);
+    int h = lv_obj_get_width(label);
+    ESP_LOGI(TAG, "width: %d, height: %d", w, h);
 }
 
 static void clock_sec_label(lv_obj_t *label) {

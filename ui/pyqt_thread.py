@@ -28,8 +28,6 @@ class LabelContainer:
         self.timer = TimerLabel("red")
 
 
-
-
 class WriteData:
     def __init__(self, data_type: int,  timer_x: int, timer_y: int):
         self.data_type = data_type
@@ -94,8 +92,6 @@ class TimerLabel(Color):
         self.move(timer_x + int(dir_x), timer_y + int(dir_y))
 
 
-
-
 class MainWindow(QMainWindow):
     def __init__(self, test_q, read_queue):
         super().__init__()
@@ -152,9 +148,9 @@ class MainWindow(QMainWindow):
             int(y * h_ratio)
         )
 
-        # width = int(w * w_ratio)
-        # height = int(h * h_ratio)
-        # self.labels.timer.setFixedSize(width, height)
+        width = int(w * w_ratio)
+        height = int(h * h_ratio)
+        self.labels.timer.setFixedSize(width, height)
 
 
     def sync_from_mcu(self):
@@ -229,14 +225,14 @@ class QueueWorker(QRunnable):
             print(f"data_type: {data_type}")
             match data_type:
                 case QueueRead.Transform:
+                    # send data to window
                     print("received current transform from mcu")
                     x = int.from_bytes(data[3:5], byteorder='little')
                     y = int.from_bytes(data[1:3], byteorder='little')
-                    w = int.from_bytes(data[5:9], byteorder="little")
-                    h = int.from_bytes(data[9:13], byteorder="little")
+                    w = int.from_bytes(data[9:13], byteorder="little")
+                    h = int.from_bytes(data[5:9], byteorder="little")
+                    print(f"received bounds --> x: {x}, y: {y}, w: {w}, h: {h}")
                     self.main_window.update_time_label_pos(x, y, w, h)
-                    print(f"x: {x}, y: {y}, w: {w}, h: {h}")
-                    # send data to window
                 case _:
                     print(f"unknown received data type {data_type}")
 

@@ -11,9 +11,6 @@ from bleak import BleakScanner, BleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 
-
-
-
 class Args(argparse.Namespace):
 
     def __init__(self, name: str, services: list[str] = None):
