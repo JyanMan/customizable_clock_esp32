@@ -1,4 +1,5 @@
 ## TODO
+* fetch also the color of the timer_label
 * fix up the fact that you cannot reconnect the ui editor
    - the hecking ble cannot detect for disconnection when the software is forced to quit
 * Add fetching of weather data

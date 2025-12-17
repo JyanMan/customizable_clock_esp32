@@ -29,6 +29,7 @@ typedef struct ClockStopwatchUiData {
     int32_t timer_label_pos;
     int32_t timer_label_width;
     int32_t timer_label_height;
+    uint16_t timer_color;
 } ClockStopwatchUiData;
 
 typedef struct Position {

@@ -18,6 +18,8 @@
 #define CLOCK_STOPWATCH_TASK_PRIORITY 3
 #define CLOCK_STOPWATCH_TASK_STACK_SIZE 3 * 1024
 
+#define DEBUG 1
+
 static volatile uint32_t local_time_s = 0;
 static volatile uint16_t time_year = 0;
 static volatile uint8_t time_month = 0;
@@ -43,7 +45,14 @@ QueueHandle_t ui_write_queue;
 QueueHandle_t ui_read_queue;
 
 /* PUBLIC FUNCTIONS */
-ClockStopwatchInfo *get_stopwatch_info() { return &stopwatch_info; }
+ClockStopwatchInfo *get_stopwatch_info() {
+#if DEBUG
+    return &stopwatch_info;
+#else
+    ESP_LOGE(TAG, "improper getting of stopwatch info at published version");
+#endif
+
+}
 
 void clock_stopwatch_init() {
     init_lvgl_ui();
@@ -87,18 +96,18 @@ static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info) {
     int32_t timer_label_pos = (timer_label_x << 16) | timer_label_y;
     ui_data.timer_label_pos = timer_label_pos;
 
-    ESP_LOGI(TAG, "x_pos: %d", timer_label_x);
-    ESP_LOGI(TAG, "y_pos: %d", timer_label_y);
-    ESP_LOGI(TAG, "width: %d", ui_data.timer_label_width);
-    ESP_LOGI(TAG, "height: %d", ui_data.timer_label_height);
+    ESP_LOGD(TAG, "x_pos: %d", timer_label_x);
+    ESP_LOGD(TAG, "y_pos: %d", timer_label_y);
+    ESP_LOGD(TAG, "width: %d", ui_data.timer_label_width);
+    ESP_LOGD(TAG, "height: %d", ui_data.timer_label_height);
 
     ui_data.timer_label_width = lv_obj_get_width(stopwatch_info->time_label);
     ui_data.timer_label_height = lv_obj_get_height(stopwatch_info->time_label);
 
     _lock_release(&lvgl_api_lock);
 
-    ESP_LOGI(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
-    ESP_LOGI(TAG, "send data width: %d, height: %d", ui_data.timer_label_width, ui_data.timer_label_height);
+    ESP_LOGD(TAG, "sent data pos for ui_read_queue: %x", ui_data.timer_label_pos);
+    ESP_LOGD(TAG, "send data width: %d, height: %d", ui_data.timer_label_width, ui_data.timer_label_height);
 
     xQueueSend(ui_read_queue, &ui_data, 0);
 }
