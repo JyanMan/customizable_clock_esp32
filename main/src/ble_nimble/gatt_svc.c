@@ -56,6 +56,7 @@ static int clock_ui_chr_access(
 ) {
     int rc;
     switch (ctxt->op) {
+        /* receive data */
         case BLE_GATT_ACCESS_OP_WRITE_CHR:
             if (conn_handle != BLE_HS_CONN_HANDLE_NONE) {
                 ESP_LOGI(TAG, "characteristic write; conn_handle=%d attr_handle=%d",
@@ -76,26 +77,28 @@ static int clock_ui_chr_access(
                 return rc;
             }
             uint8_t *data = ctxt->om->om_data;
-            uint8_t data_type = data[0]; 
-            WriteData write_data;
+            client_data_t data_type = data[0]; 
+
+            ESP_LOGD(TAG, "data type: %x", data_type);
+
+            DataFromClient data_from_client;
+            data_from_client.data_type = data_type;
             switch (data_type) {
-                case 0x00:
-                    write_data.data_type = WRITE_DATA_REQUESTDATA;
-                    write_data.value.request_data = true;
+                case CLIENT_DATA_REQUESTDATA:
+                    data_from_client.value.request_data = true;
                     ESP_LOGI(TAG, "data received is of type REQUESTDATA");
                     break;
-                case 0x01:
-                    /* receive data */
-                    write_data.data_type = WRITE_DATA_POSITION;
-                    write_data.value.pos.x= data[1] | (data[2] << 8);
-                    write_data.value.pos.y = data[3] | (data[4] << 8);
+                case CLIENT_DATA_TIMER_POSITION:
+                    data_from_client.value.pos.x = data[1] | (data[2] << 8);
+                    data_from_client.value.pos.y = data[3] | (data[4] << 8);
                     /* put to queue to be read from the tasks */
                     break;
             }
 
-            xQueueSend(ui_write_queue, &write_data, 100 / portTICK_PERIOD_MS);
+            xQueueSend(ui_write_queue, &data_from_client, 100 / portTICK_PERIOD_MS);
 
             return rc;
+        /* send data via ble */
         case BLE_GATT_ACCESS_OP_READ_CHR:
             if (conn_handle != BLE_HS_CONN_HANDLE_NONE) {
                 ESP_LOGI(TAG, "characteristic read; conn_handle=%d attr_handle=%d",
@@ -116,7 +119,6 @@ static int clock_ui_chr_access(
                 int32_t timer_label_pos = ui_data.timer_label_pos;
                 ESP_LOGI(TAG, "received queue as ui_data and its timer_label_pos: %x", timer_label_pos);
                 
-                /* send data via ble */
                 uint8_t data_header = 0x01;
                 
                 os_mbuf_append(ctxt->om, &data_header, sizeof(uint8_t));

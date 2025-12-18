@@ -41,17 +41,20 @@ union WriteDataValue {
     bool request_data;
 };
 
-enum WriteDataType {
-    WRITE_DATA_POSITION,
-    WRITE_DATA_REQUESTDATA      
+typedef uint8_t client_data_t;
+
+enum {
+    CLIENT_DATA_REQUESTDATA = 0x00,
+    CLIENT_DATA_TIMER_POSITION = 0x01,
 };
 
-typedef struct WriteData {
+/* data from editor (e.g. python software) */
+typedef struct DataFromClient {
     union WriteDataValue value;
-    enum WriteDataType data_type;
+    client_data_t data_type;
     // int16_t timer_label_x;
     // int16_t timer_label_y;
-} WriteData;
+} DataFromClient;
 
 /* data queue for ui position changes */
 extern QueueHandle_t ui_write_queue;

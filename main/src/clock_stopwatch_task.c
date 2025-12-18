@@ -154,7 +154,7 @@ static void stopwatch_increment_timer_init() {
 static void init_queues_and_semaphores() {
     ESP_LOGI(TAG, "create queues");
     ui_read_queue = xQueueCreate(1, sizeof(ClockStopwatchUiData));
-    ui_write_queue = xQueueCreate(10, sizeof(WriteData));
+    ui_write_queue = xQueueCreate(10, sizeof(DataFromClient));
 
     ESP_LOGI(TAG, "creating timer incrementor");
     semaphore_stopwatch = xSemaphoreCreateBinary();
@@ -183,15 +183,15 @@ static void clock_stopwatch_task(void *params) {
         local_time_s += 1;
 
         if (stopwatch_info) {
-            WriteData write_data;
+            DataFromClient data_from_client;
 
-            if( xQueueReceive( ui_write_queue, &( write_data), 0 ) == pdPASS ) {
+            if( xQueueReceive( ui_write_queue, &( data_from_client), 0 ) == pdPASS ) {
 
-                switch (write_data.data_type) {
-                    case WRITE_DATA_POSITION:
+                switch (data_from_client.data_type) {
+                    case CLIENT_DATA_TIMER_POSITION:
                         ESP_LOGI(TAG, "received point 1");
-                        int16_t x = write_data.value.pos.x;
-                        int16_t y = write_data.value.pos.y;
+                        int16_t x = data_from_client.value.pos.x;
+                        int16_t y = data_from_client.value.pos.y;
 
                         _lock_acquire(&lvgl_api_lock);
                         lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
@@ -199,7 +199,7 @@ static void clock_stopwatch_task(void *params) {
 
                         ESP_LOGI(TAG, "x: %d, y: %d", x, y);
                         break;
-                    case WRITE_DATA_REQUESTDATA:
+                    case CLIENT_DATA_REQUESTDATA:
                         send_read_queue_ui_data(stopwatch_info);
                         ESP_LOGI(TAG, "requested data");
                         break;
