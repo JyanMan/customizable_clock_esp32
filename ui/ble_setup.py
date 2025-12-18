@@ -24,8 +24,7 @@ class Args(argparse.Namespace):
         self.debug = False
 
 
-
-async def read_data_from_mcu(client, request_data, chr_uuid):
+async def read_data_from_mcu(client, request_ui_data, chr_uuid):
     try: 
         data= await client.read_gatt_char(chr_uuid)
 
@@ -42,19 +41,20 @@ async def read_data_from_mcu(client, request_data, chr_uuid):
                     w = int.from_bytes(data[9:13], byteorder="little")
                     h = int.from_bytes(data[5:9], byteorder="little")
                     print(f"received bounds --> x: {x}, y: {y}, w: {w}, h: {h}")
-            # self.main_window.update_time_label_pos(x, y, w, h)
+                case _:
+                    pass
 
-            request_data.emit(StopwatchUiData(x, y, w, h))
-            # read_queue.put_nowait(read_current_data)
+            request_ui_data.emit(StopwatchUiData(x, y, w, h))
+
     except Exception as e:
         print(e)
 
 
-async def send_data_to_mcu(client, write_queue: queue.Queue, chr_uuid):
-    if write_queue.empty():
+async def send_data_to_mcu(client, write_mcu_queue: queue.Queue, chr_uuid):
+    if write_mcu_queue.empty():
         return
 
-    result: WriteData = write_queue.get_nowait();  
+    result: WriteData = write_mcu_queue.get_nowait();  
 
     match result.data_type:
         case WriteDataType.RequestData:
@@ -76,10 +76,10 @@ async def send_data_to_mcu(client, write_queue: queue.Queue, chr_uuid):
     if result:
         print("received")
 
-    write_queue.task_done()
+    write_mcu_queue.task_done()
     
 
-async def ble_setup(args: Args, write_queue: queue.Queue, request_data):
+async def ble_setup(args: Args, write_mcu_queue: queue.Queue, request_ui_data):
     logger = logging.getLogger(__name__)
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(
@@ -119,8 +119,8 @@ async def ble_setup(args: Args, write_queue: queue.Queue, request_data):
             while True:
 
                 await asyncio.sleep(0.05)  # prevent too fast change
-                await read_data_from_mcu(client, request_data, chr_uuid)
-                await send_data_to_mcu(client, write_queue, chr_uuid)
+                await read_data_from_mcu(client, request_ui_data, chr_uuid)
+                await send_data_to_mcu(client, write_mcu_queue, chr_uuid)
 
         logger.info("disconnecting...")
 

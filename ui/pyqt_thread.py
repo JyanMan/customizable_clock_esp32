@@ -86,13 +86,13 @@ class TimerLabel(Color):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, write_queue, read_queue):
+    def __init__(self, write_mcu_queue):
         super().__init__()
 
         self.mouse_state = MouseState
 
-        self.write_queue: queue.Queue = write_queue
-        self.read_queue: queue.Queue = read_queue;
+        self.write_mcu_queue: queue.Queue = write_mcu_queue
+        # self.read_queue: queue.Queue = read_queue;
 
         self.labels = LabelContainer()
         
@@ -110,15 +110,13 @@ class MainWindow(QMainWindow):
         self.main_widget.setLayout(self.layout)
         self.setCentralWidget(self.main_widget)
 
-        self.init_workers()
+        self.init_threads()
 
 
-    def init_workers(self):
+    def init_threads(self):
 
-        # pool = QThreadPool.globalInstance()
-        self.ble_worker = BleWorker(self.write_queue, self.read_queue)
-        # self.queue_worker = QueueWorker(self.write_queue, self.read_queue, self)
-        self.ble_worker.request_data.connect(self.update_time_label_pos)
+        self.ble_worker = BleThread(self.write_mcu_queue)
+        self.ble_worker.request_ui_data.connect(self.update_time_label_pos)
         self.ble_worker.start()
 
 
@@ -136,23 +134,7 @@ class MainWindow(QMainWindow):
 
 
     def sync_from_mcu(self):
-        self.write_queue.put_nowait(WriteData(WriteDataType.RequestData))
-        pass
-        # self.write_queue.put_nowait()
-        # if not self.read_queue.empty():
-        #     new_pos: queue.Queue = self.read_queue.get_nowait()
-        #     x = new_pos[0]
-        #     y = new_pos[1]
-        #     w_ratio = self.width() / MCU_CANVAS_WIDTH
-        #     h_ratio = self.height() / MCU_CANVAS_HEIGHT
-        #     self.labels.timer.move(
-        #         int(x * w_ratio),
-        #         int(y * h_ratio)
-        #     )
-
-        #     width = int(new_pos[2] * w_ratio)
-        #     height = int(new_pos[3] * h_ratio)
-        #     self.labels.timer.setFixedSize(width, height)
+        self.write_mcu_queue.put_nowait(WriteData(WriteDataType.RequestData))
 
 
     def mouseMoveEvent(self, e):
@@ -173,7 +155,7 @@ class MainWindow(QMainWindow):
             w_ratio = MCU_CANVAS_WIDTH / self.width()
             h_ratio = MCU_CANVAS_HEIGHT / self.height()
 
-            self.write_queue.put_nowait(WriteData(
+            self.write_mcu_queue.put_nowait(WriteData(
                WriteDataType.TimerPosition,
                int(round(self.labels.timer.x() * w_ratio)),
                int(round(self.labels.timer.y() * h_ratio)),
@@ -182,64 +164,28 @@ class MainWindow(QMainWindow):
         self.mouse_state.drag = False
             
 
-def app_thread(write_queue: queue.Queue, read_queue: queue.Queue):
+def app_thread(write_mcu_queue: queue.Queue, read_queue: queue.Queue):
     
     app = QApplication(sys.argv)
 
     # Create a Qt widget, which will be our window.
-    window = MainWindow(write_queue, read_queue)
+    window = MainWindow(write_mcu_queue)
     window.show()  # IMPORTANT!!!!! Windows are hidden by default.
     app.exec()
 
 
-class QueueWorker(QThread):
 
-    # request_data = QtCore.pyqtSignal(PointsList)
+class BleThread(QThread):
     
-    def __init__(self, write_queue, read_queue, main_window):
-        super().__init__()        
-        self.write_queue = write_queue
-        self.read_queue = read_queue
-        # self.main_window: MainWindow = main_window
-
-
-    # def read_queues(self):
-    #     if not self.read_queue.empty():
-    #         data: bytes = self.read_queue.get_nowait()
-    #         data_type = data[0]
-    #         print(f"data_type: {data_type}")
-    #         match data_type:
-    #             case QueueRead.Transform:
-    #                 # send data to window
-    #                 print("received current transform from mcu")
-    #                 x = int.from_bytes(data[3:5], byteorder='little')
-    #                 y = int.from_bytes(data[1:3], byteorder='little')
-    #                 w = int.from_bytes(data[9:13], byteorder="little")
-    #                 h = int.from_bytes(data[5:9], byteorder="little")
-    #                 print(f"received bounds --> x: {x}, y: {y}, w: {w}, h: {h}")
-    #                 self.main_window.update_time_label_pos(x, y, w, h)
-    #             case _:
-    #                 print(f"unknown received data type {data_type}")
-
-
-    def run(self):
-        while True:
-            self.read_queues()
-            
-
-
-class BleWorker(QThread):
+    request_ui_data = pyqtSignal(StopwatchUiData)
     
-    request_data = pyqtSignal(StopwatchUiData)
-    
-    def __init__(self, write_queue, read_queue):
+    def __init__(self, write_mcu_queue):
         super().__init__()
-        self.write_queue: queue.Queue = write_queue
-        self.read_queue: queue.Queue = read_queue
+        self.write_mcu_queue: queue.Queue = write_mcu_queue
 
 
     def run(self):
-        asyncio.run(ble.ble_setup(ble.Args("NimBLE_GATT"), self.write_queue, self.request_data))
+        asyncio.run(ble.ble_setup(ble.Args("NimBLE_GATT"), self.write_mcu_queue, self.request_ui_data))
 
 
 if __name__ == "__main__":
