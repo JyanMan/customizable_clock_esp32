@@ -3,6 +3,7 @@ import asyncio
 import logging
 import queue
 
+from enum import Enum
 from typing import Optional
 
 from pyqt_thread import WriteData
@@ -10,6 +11,8 @@ from pyqt_thread import WriteData
 from bleak import BleakScanner, BleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
+from protocol import WriteDataType, WriteData, StopwatchUiData, QueueRead
+
 
 class Args(argparse.Namespace):
 
@@ -19,9 +22,64 @@ class Args(argparse.Namespace):
         self.macos_use_bdaddr = False
         self.pair = False
         self.debug = False
+
+
+
+async def read_data_from_mcu(client, request_data, chr_uuid):
+    try: 
+        data= await client.read_gatt_char(chr_uuid)
+
+        if len(data) != 0:
+            print(f"received from mcu data: {data}")
+
+            # send data to window
+            data_type = data[0]
+            match data_type:
+                case QueueRead.Transform:
+                    print("received current transform from mcu")
+                    x = int.from_bytes(data[3:5], byteorder='little')
+                    y = int.from_bytes(data[1:3], byteorder='little')
+                    w = int.from_bytes(data[9:13], byteorder="little")
+                    h = int.from_bytes(data[5:9], byteorder="little")
+                    print(f"received bounds --> x: {x}, y: {y}, w: {w}, h: {h}")
+            # self.main_window.update_time_label_pos(x, y, w, h)
+
+            request_data.emit(StopwatchUiData(x, y, w, h))
+            # read_queue.put_nowait(read_current_data)
+    except Exception as e:
+        print(e)
+
+
+async def send_data_to_mcu(client, write_queue: queue.Queue, chr_uuid):
+    if write_queue.empty():
+        return
+
+    result: WriteData = write_queue.get_nowait();  
+
+    match result.data_type:
+        case WriteDataType.RequestData:
+            print("requested for data from mcu")
+            await client.write_gatt_char(chr_uuid, bytes(b"\x00\x00\x00\x00\x00"), response=False)
+        case WriteDataType.TimerPosition:
+            # data_to_send: int =  result.x() | (result.y() << 16)
+            x16 = result.timer_x & 0xFFFF
+            y16 = result.timer_y & 0xFFFF
+
+            data_to_send = x16 | (y16 << 16)
+            pos_bytes= data_to_send.to_bytes(4, byteorder="little", signed=False)
+            data_bytes = b"\x01" + pos_bytes
+
+            print(f"sent to mcu in bytes -> x: {x16}, y: {y16}, combined: {data_bytes}")
+
+            await client.write_gatt_char(chr_uuid, data_bytes, response=False)
+    
+    if result:
+        print("received")
+
+    write_queue.task_done()
     
 
-async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
+async def ble_setup(args: Args, write_queue: queue.Queue, request_data):
     logger = logging.getLogger(__name__)
     log_level = logging.DEBUG if args.debug else logging.INFO
     logging.basicConfig(
@@ -54,52 +112,15 @@ async def ble_setup(args: Args, test_q: queue.Queue, read_queue: queue.Queue):
         svc_uuid = "002E4767-C69D-1382-9944-B99FE7FAF2D2"
         chr_uuid = "46F65758-1557-EF97-124E-D90845DBDAA2"
         nus = client.services.get_service(svc_uuid)
-
         
-
         if nus is None:
             logger.info("no service for controller found...")
         else:
             while True:
-                try: 
-                    read_current_data = await client.read_gatt_char(chr_uuid)
-
-                    if len(read_current_data) != 0:
-                        print(f"received from mcu data: {read_current_data}")
-
-                        read_queue.put_nowait(read_current_data)
-                except Exception as e:
-                    print(e)
 
                 await asyncio.sleep(0.05)  # prevent too fast change
-
-                if test_q.empty():
-                    continue
-
-                result: WriteData = test_q.get_nowait();  
-
-                match result.data_type:
-                    case 0:
-                        await client.write_gatt_char(chr_uuid, bytes(b"\x00\x00\x00\x00\x00"), response=False)
-                    case 1:
-                        # data_to_send: int =  result.x() | (result.y() << 16)
-                        x16 = result.timer_x & 0xFFFF
-                        y16 = result.timer_y & 0xFFFF
-
-
-                        data_to_send = x16 | (y16 << 16)
-                        pos_bytes= data_to_send.to_bytes(4, byteorder="little", signed=False)
-                        data_bytes = b"\x01" + pos_bytes
-
-                        print(f"sent to mcu in bytes -> x: {x16}, y: {y16}, combined: {data_bytes}")
-
-                        await client.write_gatt_char(chr_uuid, data_bytes, response=False)
-                        
-                
-                if result:
-                    print("received")
-                test_q.task_done()
-
+                await read_data_from_mcu(client, request_data, chr_uuid)
+                await send_data_to_mcu(client, write_queue, chr_uuid)
 
         logger.info("disconnecting...")
 
