@@ -30,15 +30,22 @@ static _lock_t lvgl_api_lock;
 static const char *TAG = "clock stopwatch task";
 static ClockStopwatchUiData ui_data;
 static ClockStopwatchInfo stopwatch_info;
-static SemaphoreHandle_t semaphore_stopwatch;
+static enum ClockStopwatchState stopwatch_state = CS_STATE_OK;
 
 static void init_lvgl_ui();
+
 static void clock_stopwatch_sync_sntp_task(void *params);
-static void clock_stopwatch_task(void *params);
+static void clock_stopwatch_time_incrementor(void *params);
+static void clock_stopwatch_state_task(void *params);
+static void clock_stopwatch_update_ui(void *params);
+
 static void send_read_queue_ui_data(ClockStopwatchInfo *stopwatch_info);
 static void init_tasks();
 static void stopwatch_increment_timer_init();
 static void init_queues_and_semaphores();
+
+static SemaphoreHandle_t semaphore_stopwatch;
+static QueueHandle_t stopwatch_state_queue;
 
 /* public variables */
 QueueHandle_t ui_write_queue;
@@ -155,6 +162,7 @@ static void init_queues_and_semaphores() {
     ESP_LOGI(TAG, "create queues");
     ui_read_queue = xQueueCreate(1, sizeof(ClockStopwatchUiData));
     ui_write_queue = xQueueCreate(10, sizeof(DataFromClient));
+    stopwatch_state_queue = xQueueCreate(1, sizeof(DataFromClient));
 
     ESP_LOGI(TAG, "creating timer incrementor");
     semaphore_stopwatch = xSemaphoreCreateBinary();
@@ -165,14 +173,54 @@ static void init_queues_and_semaphores() {
 
 static void init_tasks() {
     ESP_LOGI(TAG, "Creating Stopwatch Update Tasks");
-    xTaskCreate(clock_stopwatch_task, "CLOCK STOPWATCH", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+    xTaskCreate(clock_stopwatch_state_task, "CS STATE TASK", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
         &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
-    xTaskCreate(clock_stopwatch_sync_sntp_task, "CLOCK STOPWATCH SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+    xTaskCreate(clock_stopwatch_update_ui, "CS UPDATE UI TASK", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+    xTaskCreate(clock_stopwatch_time_incrementor, "CS TIME INCREMENTOR", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
+        &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
+    xTaskCreate(clock_stopwatch_sync_sntp_task, "CS SYNC SNTP", CLOCK_STOPWATCH_TASK_STACK_SIZE, 
         &stopwatch_info, CLOCK_STOPWATCH_TASK_PRIORITY, NULL);
 }
 
+static void clock_stopwatch_update_ui(void *params) {
+    for ( ;; ) {
+
+        ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
+        if (stopwatch_info == NULL) {
+            continue;
+        }
+        
+        DataFromClient data_from_client;
+
+        if( xQueueReceive( ui_write_queue, &( data_from_client), 0 ) == pdPASS ) {
+
+            switch (data_from_client.data_type) {
+                case CLIENT_DATA_TIMER_POSITION:
+                    ESP_LOGI(TAG, "received point 1");
+                    int16_t x = data_from_client.value.pos.x;
+                    int16_t y = data_from_client.value.pos.y;
+
+                    _lock_acquire(&lvgl_api_lock);
+                    lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
+                    _lock_release(&lvgl_api_lock);
+
+                    ESP_LOGI(TAG, "x: %d, y: %d", x, y);
+                    break;
+                case CLIENT_DATA_REQUESTDATA:
+                    send_read_queue_ui_data(stopwatch_info);
+                    ESP_LOGI(TAG, "requested data");
+                    break;
+            }
+
+        }
+
+        vTaskDelay( 1000.0f / portTICK_PERIOD_MS );
+    }
+}
+
 /* for optimizations, separate the incrementation and this whole thing */
-static void clock_stopwatch_task(void *params) {
+static void clock_stopwatch_time_incrementor(void *params) {
     for ( ;; ) {
         if ( xSemaphoreTake( semaphore_stopwatch, portMAX_DELAY) == pdFALSE ) {
             continue;
@@ -182,30 +230,16 @@ static void clock_stopwatch_task(void *params) {
         // increment time
         local_time_s += 1;
 
+        switch (clock_stopwatch_get_state()) {
+            case CS_STATE_OK:
+                break;
+            case CS_STATE_WIFI_FAILED:
+                break;
+            case CS_STATE_LIVE_UPDATE:
+                break;
+        }
+
         if (stopwatch_info) {
-            DataFromClient data_from_client;
-
-            if( xQueueReceive( ui_write_queue, &( data_from_client), 0 ) == pdPASS ) {
-
-                switch (data_from_client.data_type) {
-                    case CLIENT_DATA_TIMER_POSITION:
-                        ESP_LOGI(TAG, "received point 1");
-                        int16_t x = data_from_client.value.pos.x;
-                        int16_t y = data_from_client.value.pos.y;
-
-                        _lock_acquire(&lvgl_api_lock);
-                        lv_obj_align(stopwatch_info->time_label, LV_ALIGN_TOP_LEFT, x, y);
-                        _lock_release(&lvgl_api_lock);
-
-                        ESP_LOGI(TAG, "x: %d, y: %d", x, y);
-                        break;
-                    case CLIENT_DATA_REQUESTDATA:
-                        send_read_queue_ui_data(stopwatch_info);
-                        ESP_LOGI(TAG, "requested data");
-                        break;
-                }
-
-            }
 
             char local_time_str[16];
             char sec_str[4];
@@ -222,6 +256,7 @@ static void clock_stopwatch_task(void *params) {
             lv_label_set_text(stopwatch_info->sec_label, sec_str);
             _lock_release(&lvgl_api_lock);
         }
+
     }
 }
 
@@ -259,39 +294,57 @@ static void update_date_label(ClockStopwatchInfo *stopwatch_info) {
     _lock_release(&lvgl_api_lock);
 }
 
-static void clock_stopwatch_sync_sntp_task(void *params) {
 
-    static volatile uint8_t sync_retries = 0;
+#define SNTP_END -1
+#define SNTP_START 0
+#define SNTP_MAX_RETRIES 5
+#define SNTP_TASK_RECONNECT_SEC 5
+#define SNTP_RESET_SEC ONE_HOUR_IN_SEC
+
+static void clock_stopwatch_sync_sntp_task(void *params) {
+    static volatile int sync_retries = SNTP_START;
     static const uint8_t retry_sec = 5;
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    ESP_ERROR_CHECK(wifi_full_init());
 
-    // sync on boot
-    if (sntp_sync() == ESP_ERR_TIMEOUT) {
-        sync_retries++;
-    }
+    ESP_LOGD(TAG, "full initializing wifi sta...");
+    /* no need for error check... simply exit the task once it enters the loop */
+    wifi_init_sta();
+
+    ESP_LOGD(TAG, "wifi init scanning");
+    wifi_start_scan();
+
     for ( ;; ) {
+
+        if (clock_stopwatch_get_state() == CS_STATE_WIFI_FAILED) {
+            ESP_LOGE(TAG, "failed to connect to wifi, reconnecting in %d", SNTP_TASK_RECONNECT_SEC);
+            // vTaskDelete(NULL); // end this task
+            // return;
+            vTaskDelay(SNTP_TASK_RECONNECT_SEC * 1000 / portTICK_PERIOD_MS);
+            wifi_start_scan();
+            continue;
+        }
 
         ClockStopwatchInfo *stopwatch_info = (ClockStopwatchInfo *)params;
         update_date_label(stopwatch_info);
 
-        if (sync_retries >= 5) {
+        if (sync_retries >= SNTP_MAX_RETRIES) {
             ESP_LOGE(TAG, "unable to sync after %d retries", retry_sec);
-            sync_retries = 0;
+            sync_retries = SNTP_START;
         }
-        if (sync_retries != 0) {
+        if (sync_retries != SNTP_END) {
             ESP_LOGI(TAG, "unable to sync sntp... retrying in %d sec", retry_sec);
             vTaskDelay((retry_sec * 1000) / portTICK_PERIOD_MS);
-            if (sntp_sync() == ESP_ERR_TIMEOUT) {
+            if (sntp_sync() != ESP_OK) {
                 continue;
             }
             else {
-                sync_retries = 0;
+                sync_retries = SNTP_END;
             }
         }
 
+        /* resync once an hour passes */
         uint8_t local_hours = local_time_s / ONE_HOUR_IN_SEC;
         if (local_hours == 0 || local_hours == 1) {
             if (sntp_sync() == ESP_ERR_TIMEOUT) {
@@ -300,6 +353,32 @@ static void clock_stopwatch_sync_sntp_task(void *params) {
             }
         }
 
-        vTaskDelay((ONE_HOUR_IN_SEC * 1000) / portTICK_PERIOD_MS);
+        ESP_ERROR_CHECK(wifi_stop_scan());
+
+        vTaskDelay(SNTP_RESET_SEC * 1000 / portTICK_PERIOD_MS);
+
+        ESP_ERROR_CHECK(wifi_start_scan());
+    }
+}
+
+void clock_stopwatch_set_state(enum ClockStopwatchState new_state) {
+    xQueueSend(stopwatch_state_queue, &new_state, 0);
+}
+
+enum ClockStopwatchState clock_stopwatch_get_state() {
+    return stopwatch_state;
+}
+
+static void clock_stopwatch_state_task(void *params) {
+   
+    for ( ;; ) {
+
+        enum ClockStopwatchState new_state;
+        
+        if (xQueueReceive(stopwatch_state_queue, &new_state, 0)) {
+            stopwatch_state = new_state;       
+        }
+        
+        vTaskDelay(500.0f / portTICK_PERIOD_MS);
     }
 }

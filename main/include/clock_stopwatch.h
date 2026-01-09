@@ -43,6 +43,12 @@ union WriteDataValue {
 
 typedef uint8_t client_data_t;
 
+enum ClockStopwatchState {
+    CS_STATE_OK,   
+    CS_STATE_LIVE_UPDATE,
+    CS_STATE_WIFI_FAILED,
+};
+
 enum {
     CLIENT_DATA_REQUESTDATA = 0x00,
     CLIENT_DATA_TIMER_POSITION = 0x01,
@@ -62,6 +68,8 @@ extern QueueHandle_t ui_write_queue;
 extern QueueHandle_t ui_read_queue;
 
 ClockStopwatchInfo *get_stopwatch_info();
+enum ClockStopwatchState clock_stopwatch_get_state();
+void clock_stopwatch_set_state(enum ClockStopwatchState new_state);
 void clock_stopwatch_init();
 void clock_stopwatch_info_init(ClockStopwatchInfo *csi);
 void clock_countdown_lvgl_ui(lv_display_t *disp, ClockStopwatchInfo *stopwatch_info);

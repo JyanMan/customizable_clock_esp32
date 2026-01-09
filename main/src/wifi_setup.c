@@ -20,6 +20,7 @@
 #include "lwip/sys.h"
 
 #include "wifi_setup.h"
+#include "clock_stopwatch.h"
 
 /* The examples use WiFi configuration that you can set via project configuration menu
 
@@ -84,6 +85,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
             ESP_LOGI(TAG, "retry to connect to the AP");
         } else {
             xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
+            clock_stopwatch_set_state(CS_STATE_WIFI_FAILED);
         }
         ESP_LOGI(TAG,"connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
@@ -91,10 +93,19 @@ static void event_handler(void* arg, esp_event_base_t event_base,
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         s_retry_num = 0;
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
+        clock_stopwatch_set_state(CS_STATE_OK);
     }
 }
 
 esp_err_t wifi_init_sta(void) {
+    if (CONFIG_LOG_MAXIMUM_LEVEL > CONFIG_LOG_DEFAULT_LEVEL) {
+        /* If you only want to open more logs in the wifi module, you need to make the max level greater than the default level,
+         * and call esp_log_level_set() before esp_wifi_init() to improve the log level of the wifi module. */
+        esp_log_level_set("wifi", CONFIG_LOG_MAXIMUM_LEVEL);
+    }
+
+    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+
     s_wifi_event_group = xEventGroupCreate();
 
     esp_netif_create_default_wifi_sta();
@@ -134,24 +145,18 @@ esp_err_t wifi_init_sta(void) {
     };
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
-    return wifi_start_scan();
+    return ESP_OK;
+    // return wifi_start_scan();
 }
 
-esp_err_t wifi_full_init() {
-    if (CONFIG_LOG_MAXIMUM_LEVEL > CONFIG_LOG_DEFAULT_LEVEL) {
-        /* If you only want to open more logs in the wifi module, you need to make the max level greater than the default level,
-         * and call esp_log_level_set() before esp_wifi_init() to improve the log level of the wifi module. */
-        esp_log_level_set("wifi", CONFIG_LOG_MAXIMUM_LEVEL);
-    }
-
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-    return wifi_init_sta();
-}
+// esp_err_t wifi_full_init() {
+//     return wifi_init_sta();
+// }
 
 esp_err_t wifi_start_scan() {
     ESP_ERROR_CHECK(esp_wifi_start() );
 
-    ESP_LOGI(TAG, "wifi_init_sta finished.");
+    ESP_LOGD(TAG, "wifi_init_sta finished.");
 
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
